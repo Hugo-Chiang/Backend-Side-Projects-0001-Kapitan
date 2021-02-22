@@ -7,10 +7,12 @@ $db_user = getenv('username');
 $db_pass = getenv('password');
 $db_select = getenv('dbname');
 
-echo $db_host;
-echo $db_user;
-echo $db_pass;
-echo $db_select;
+echo $my_env_var;
+
+// echo $db_host;
+// echo $db_user;
+// echo $db_pass;
+// echo $db_select;
 
 $dsn = "mysql:host=" . $db_host.";dbname=" . $db_select;
 
