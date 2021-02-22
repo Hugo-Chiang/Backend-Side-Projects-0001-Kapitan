@@ -1,18 +1,9 @@
 <?php
 
-$my_env_var = getenv('MY_VAR');
-
-$db_host = getenv('servername');
+$db_host = getenv('host');
 $db_user = getenv('username');
 $db_pass = getenv('password');
-$db_select = getenv('dbname');
-
-echo $my_env_var;
-
-// echo $db_host;
-// echo $db_user;
-// echo $db_pass;
-// echo $db_select;
+$db_select = getenv('database');
 
 $dsn = "mysql:host=" . $db_host.";dbname=" . $db_select;
 
