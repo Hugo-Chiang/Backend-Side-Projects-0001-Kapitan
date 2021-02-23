@@ -8,6 +8,7 @@ $db_select = getenv('database');
 $dsn = "mysql:host=" . $db_host.";dbname=" . $db_select;
 
 $pdo = new PDO($dsn, $db_user, $db_pass);
+$pdo -> exec('set names utf-8');
 
 return $pdo;
 
