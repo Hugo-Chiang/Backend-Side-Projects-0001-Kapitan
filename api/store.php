@@ -7,8 +7,6 @@ header("Content-Type:text/html; charset=utf-8");
 
 include("PDO.php");
 
-mysql_query('SET NAMES UTF8'); 
-
 $sql = "SELECT * FROM PROJECTS";
 
 $result = $pdo->query($sql);
