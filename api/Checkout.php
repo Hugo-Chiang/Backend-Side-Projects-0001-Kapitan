@@ -8,6 +8,8 @@ header("Content-Type:text/html; charset=utf-8");
 
 // 導入PDO以安全連線資練庫
 include("../Lib/PDO.php");
+// 導入自定義函式庫
+include("../Lib/Functions.php");
 
 // 接收前端 JSON 字串資料並解析
 $json_string = file_get_contents("php://input");
@@ -19,11 +21,6 @@ $orderer_contact_info_arr = $json_data->ordererContactInfo;
 $order_details_arr = $json_data->orderDetails;
 
 // 前置語法區域開始
-
-// 資料庫查詢：找到目前最新序號，以利後續生成各表格的下一序號
-$sql_select_max_order_id = "SELECT max(ORDER_ID) FROM orders";
-$sql_select_max_detail_id = "SELECT max(ORDER_DETAIL_ID) FROM order_details";
-$sql_select_max_booking_id = "SELECT max(BOOKING_ID) FROM booking";
 
 // 資料庫寫入：綁定已登入的會員帳號，寫入訂單表格（orders）
 $sql_insert_order =
@@ -37,31 +34,12 @@ VALUES (?, '20000', ?, ?, ?, ?, ?, ?, ?)";
 // 資料庫寫入：
 $sql_insert_booking =
     "INSERT INTO booking(BOOKING_ID, BOOKING_DATE, FK_PROJECT_ID_for_BK, FK_ORDER_DETAIL_ID_for_BK) 
-VALUES (?, NOW(), ?, ?)";
+VALUES (?, ?, ?, ?)";
 
 // 前置語法區域結束
 
 // 執行：判斷並寫入最新訂單編號
-$statement_select_max_order_id = $pdo->prepare($sql_select_max_order_id);
-$statement_select_max_order_id->execute();
-$order_max_id = $statement_select_max_order_id->fetch();
-
-$order_max_id == null ? 'OD0000000000' : $order_max_id;
-
-$order_max_number = (int)substr($order_max_id[0], 2, 7) + 1;
-$insert_order_id = "";
-
-if ($order_max_number < 10) {
-    $insert_order_id = "OD000000" . $order_max_number;
-} else if ($order_max_number < 100 && $order_max_number >= 10) {
-    $insert_order_id = "OD00000" . $order_max_number;
-} else if ($order_max_number < 1000 && $order_max_number >= 100) {
-    $insert_order_id = "OD0000" . $maxNumber;
-} else if ($order_max_number < 10000 && $order_max_number >= 1000) {
-    $insert_order_id = "OD000" . $maxNumber;
-} else if ($order_max_number < 100000 && $maxNumber >= 10000) {
-    $insert_order_id = "OD00" . $order_max_number;
-}
+$insert_order_id = insert_max_id($pdo, 'orders');
 
 // 執行：訂單寫入 orders 表格
 $statement_insert_order = $pdo->prepare($sql_insert_order);
@@ -69,33 +47,29 @@ $statement_insert_order->bindParam(1, $insert_order_id);
 $statement_insert_order->bindParam(2, $member_id);
 $statement_insert_order->execute();
 
-// 執行：訂單細項寫入 order_details 表格
+// 執行：訂單細項寫入 order_details 表格，同時預約紀錄寫入 booking 表格
 for ($i = 0; $i < count($order_details_arr); $i++) {
+    $insert_order_detail_id = insert_max_id($pdo, 'order_details');
 
-    // 執行：判斷並寫入最新訂單細節編號
-    $statement_select_max_detail_id  = $pdo->prepare($sql_select_max_detail_id);
-    $statement_select_max_detail_id->execute();
-    $order_max_detail_id = $statement_select_max_detail_id->fetch();
+    $statement_instert_order_detail = $pdo->prepare($sql_instert_order_detail);
+    $statement_instert_order_detail->bindParam(1, $insert_order_detail_id);
+    $statement_instert_order_detail->bindParam(2, $order_details_arr[$i]->MCname);
+    $statement_instert_order_detail->bindParam(3, $order_details_arr[$i]->MCphone);
+    $statement_instert_order_detail->bindParam(4, $order_details_arr[$i]->MCemail);
+    $statement_instert_order_detail->bindParam(5, $order_details_arr[$i]->ECname);
+    $statement_instert_order_detail->bindParam(6, $order_details_arr[$i]->ECphone);
+    $statement_instert_order_detail->bindParam(7, $order_details_arr[$i]->ECemail);
+    $statement_instert_order_detail->bindParam(8, $insert_order_id);
+    $statement_instert_order_detail->execute();
 
-    $order_max_id == null ? 'OD0000000000' : $order_max_id;
+    $insert_booking_id = insert_max_id($pdo, 'booking');
 
-    $order_max_number = (int)substr($order_max_id[0], 2, 7) + 1;
-    $insert_order_id = "";
-
-    if ($order_max_number < 10) {
-        $insert_order_id = "OD000000" . $order_max_number;
-    } else if ($order_max_number < 100 && $order_max_number >= 10) {
-        $insert_order_id = "OD00000" . $order_max_number;
-    } else if ($order_max_number < 1000 && $order_max_number >= 100) {
-        $insert_order_id = "OD0000" . $maxNumber;
-    } else if ($order_max_number < 10000 && $order_max_number >= 1000) {
-        $insert_order_id = "OD000" . $maxNumber;
-    } else if ($order_max_number < 100000 && $maxNumber >= 10000) {
-        $insert_order_id = "OD00" . $order_max_number;
-    }
+    $statement_insert_booking = $pdo->prepare($sql_insert_booking);
+    $statement_insert_booking->bindParam(1, $insert_booking_id);
+    $statement_insert_booking->bindParam(2, $order_details_arr[$i]->bookingProjectDate);
+    $statement_insert_booking->bindParam(3, $order_details_arr[$i]->bookingProjectId);
+    $statement_insert_booking->bindParam(4, $insert_order_detail_id);
+    $statement_insert_booking->execute();
 }
 
 echo $member_id . '的訂單完成了！';
-
-?>
-.

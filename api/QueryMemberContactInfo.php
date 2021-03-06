@@ -16,5 +16,3 @@ $result = $pdo->query($sqlQueryMemberContactInfo);
 $data = $result->fetchAll();
 
 print json_encode($data);
-
-?>

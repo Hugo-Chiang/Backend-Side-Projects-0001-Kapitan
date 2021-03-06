@@ -13,5 +13,3 @@ $result = $pdo->query($sql);
 $data = $result->fetchAll();
 
 print json_encode($data);
-
-?>
