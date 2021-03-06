@@ -15,6 +15,4 @@ $opts_values = array(PDO::ATTR_PERSISTENT=>true,PDO::ATTR_ERRMODE=>2,PDO::MYSQL_
 
 $pdo = new PDO($dsn, $db_user, $db_pass, $opts_values);
 
-return $pdo;
-
 ?>
