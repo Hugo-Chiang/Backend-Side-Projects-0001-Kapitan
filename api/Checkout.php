@@ -106,9 +106,9 @@ if (count($alerady_booking_arr) > 0) {
 
     // 向前端回報結果：成功訂購
     $return_obj = (object)[
-        'status' => '訂購失敗',
-        'message' => '會員 ' . $member_id . ' 的訂單完成了！編號是：' . $insert_order_detail_id . '。',
-        'order_id' => $insert_order_detail_id,
+        'status' => '訂購成功',
+        'message' => '會員 ' . $member_id . ' 的訂單完成了！編號是：' . $insert_order_id . '。',
+        'order_id' => $insert_order_id,
     ];
 
     print json_encode($return_obj);
