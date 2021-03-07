@@ -48,7 +48,7 @@ $alerady_booking_arr = [];
 for ($i = 0; $i < count($order_details_arr); $i++) {
     $statement_query_booking = $pdo->prepare($sql_query_booking);
     $statement_query_booking->bindParam(1, $order_details_arr[$i]->bookingProjectDate);
-    $statement_query_booking->bindParam(2, $order_details_arr[$i]->bookingProjectId);
+    $statement_query_booking->bindParam(2, $order_details_arr[$i]->bookingProjectID);
     $statement_query_booking->execute();
 
     $query_result = $statement_query_booking->fetch(PDO::FETCH_ASSOC);
@@ -63,7 +63,7 @@ if (count($alerady_booking_arr) > 0) {
     // 向前端回傳結果：若干方案已有預約
     $return_obj = (object)[
         'status' => '訂購失敗',
-        'message' => '很抱歉，您所挑選的方案中，有　' . count($alerady_booking_arr) . '　筆在剛剛被預約了。<br>系統已為您刪去無法重複預約的方案，再請確認新的結帳內容。<br>謝謝您！',
+        'message' => '很抱歉，您所挑選的方案中，有　' . count($alerady_booking_arr) . '　筆在剛剛被預約了。<br>系統已為您刪去重複預約的方案，再請確認新的結帳內容。<br>謝謝您！',
         'invalidAProjects' => $alerady_booking_arr,
     ];
 
@@ -99,7 +99,7 @@ if (count($alerady_booking_arr) > 0) {
         $statement_insert_booking = $pdo->prepare($sql_insert_booking);
         $statement_insert_booking->bindParam(1, $insert_booking_id);
         $statement_insert_booking->bindParam(2, $order_details_arr[$i]->bookingProjectDate);
-        $statement_insert_booking->bindParam(3, $order_details_arr[$i]->bookingProjectId);
+        $statement_insert_booking->bindParam(3, $order_details_arr[$i]->bookingProjectID);
         $statement_insert_booking->bindParam(4, $insert_order_detail_id);
         $statement_insert_booking->execute();
     }
