@@ -62,8 +62,8 @@ if (count($alerady_booking_arr) > 0) {
 
     // 向前端回傳結果：若干方案已有預約
     $return_obj = (object)[
-        'status' => '訂購失敗',
-        'message' => '很抱歉，您所挑選的方案中，有　' . count($alerady_booking_arr) . '　筆在剛剛被預約了。<br>系統已為您刪去重複預約的方案，再請確認新的結帳內容。<br>謝謝您！',
+        'status' => '重複訂購',
+        'message' => '很抱歉，您所挑選的方案中，有【' . count($alerady_booking_arr) . '】筆在剛剛被預約了。系統已為您刪去重複預約的方案，再請確認新的結帳內容。謝謝您！',
         'invalidAProjects' => $alerady_booking_arr,
     ];
 
@@ -107,7 +107,7 @@ if (count($alerady_booking_arr) > 0) {
     // 向前端回報結果：成功訂購
     $return_obj = (object)[
         'status' => '訂購成功',
-        'message' => '會員 ' . $member_id . ' 的訂單完成了！編號是：' . $insert_order_id . '。',
+        'message' => '會員【' . $member_id . '】的訂單完成了！編號是：【' . $insert_order_id . '】。',
         'order_id' => $insert_order_id,
     ];
 
