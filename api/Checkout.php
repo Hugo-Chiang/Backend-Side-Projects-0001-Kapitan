@@ -51,7 +51,7 @@ for ($i = 0; $i < count($order_details_arr); $i++) {
     $statement_query_booking->bindParam(2, $order_details_arr[$i]->bookingProjectId);
     $statement_query_booking->execute();
 
-    $query_result = $statement_query_booking->fetchAll(PDO::FETCH_ASSOC);
+    $query_result = $statement_query_booking->fetch(PDO::FETCH_ASSOC);
 
     if ($query_result != null) {
         array_push($alerady_booking_arr, $query_result);
