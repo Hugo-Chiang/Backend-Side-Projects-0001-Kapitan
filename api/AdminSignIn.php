@@ -22,7 +22,7 @@ $statement_query_admin_account->execute();
 
 $query_result = $statement_query_admin_account->fetch(PDO::FETCH_ASSOC);
 
-// 帳密錯誤向前端返回錯誤訊息，並中止程式碼執行
+// 若帳密錯誤，向前端返回錯誤訊息，並中止程式碼執行
 if ($query_result == null) {
     $return_obj = (object)[
         'singInStatus' => false,
@@ -70,7 +70,7 @@ $statement_update_new_token->bindParam(3, $admin_id);
 $statement_update_new_token->execute();
 
 // 執行：將新 token 與到期日回傳予前端，以利進行登入驗證
-$sql_query_admin_signedin_data = "SELECT ADMIN_NAME, ADMIN_TOKEN, ADMIN_SIGNIN_TIMEOUT FROM admin WHERE ADMIN_ID = ?";
+$sql_query_admin_signedin_data = "SELECT ADMIN_TOKEN, ADMIN_SIGNIN_TIMEOUT FROM admin WHERE ADMIN_ID = ?";
 $statement_query_admin_signedin_data = $pdo->prepare($sql_query_admin_signedin_data);
 $statement_query_admin_signedin_data->bindParam(1, $admin_id);
 $statement_query_admin_signedin_data->execute();
@@ -79,7 +79,6 @@ $query_result = $statement_query_admin_signedin_data->fetch(PDO::FETCH_ASSOC);
 
 $return_obj = (object)[
     'singInStatus' => true,
-    'message' => '歡迎回來，' . $query_result['ADMIN_NAME'],
     'token' => $query_result['ADMIN_TOKEN'],
     'expDate' => $query_result['ADMIN_SIGNIN_TIMEOUT']
 ];
