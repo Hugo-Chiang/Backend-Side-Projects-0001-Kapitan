@@ -57,7 +57,7 @@ $basic_token = (function () {
 
 $new_token = str_shuffle($basic_token . $query_result['ADMIN_IDENTIFIER']);
 
-// 執行：將新 toke 寫入資料庫，並連帶產生到期日
+// 執行：將新 token 寫入資料庫，並連帶產生到期日
 $time_now = time();
 $exp_time = $time_now + (60 * 60 * 24 * 7);
 $exp_time = date("Y-m-d H:i:s", $exp_time);
@@ -69,7 +69,7 @@ $statement_update_new_token->bindParam(2, $exp_time);
 $statement_update_new_token->bindParam(3, $admin_id);
 $statement_update_new_token->execute();
 
-// 執行：將新 toke 與到期日回傳予前端，以利進行登入驗證
+// 執行：將新 token 與到期日回傳予前端，以利進行登入驗證
 $sql_query_admin_signedin_data = "SELECT ADMIN_NAME, ADMIN_TOKEN, ADMIN_SIGNIN_TIMEOUT FROM admin WHERE ADMIN_ID = ?";
 $statement_query_admin_signedin_data = $pdo->prepare($sql_query_admin_signedin_data);
 $statement_query_admin_signedin_data->bindParam(1, $admin_id);
