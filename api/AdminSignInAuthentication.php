@@ -24,7 +24,7 @@ $query_result = $statement_query_admin_session->fetch(PDO::FETCH_ASSOC);
 if ($query_result == null) {
     $return_obj = (object)[
         'sessionCheck' => false,
-        'message' => '無效的登入標記！'
+        'message' => '無效的登入對話！'
     ];
 
     print json_encode($return_obj);

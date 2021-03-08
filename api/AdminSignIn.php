@@ -41,7 +41,7 @@ $statement_query_admin_identifier = $pdo->prepare($sql_query_admin_identifier);
 $statement_query_admin_identifier->bindParam(1, $admin_id);
 $statement_query_admin_identifier->execute();
 
-$admin_identifier = $statement_query_admin_identifier->fetch(PDO::FETCH_ASSOC);
+$admin_identifier_row = $statement_query_admin_identifier->fetch(PDO::FETCH_ASSOC);
 
 // 執行：選出管理員登入所用的密鑰，以利建立登入驗證用的 session
 $para = 'admin';
@@ -50,10 +50,10 @@ $statement_query_secret_key = $pdo->prepare($sql_query_secret_key);
 $statement_query_secret_key->bindParam(1, $para);
 $statement_query_secret_key->execute();
 
-$admin_secret_key = $statement_query_secret_key->fetch(PDO::FETCH_ASSOC);
+$admin_secret_key_row = $statement_query_secret_key->fetch(PDO::FETCH_ASSOC);
 
-// 產生 session
-$session = hash('sha256', $admin_id . $admin_identifier['ADMIN_IDENTIFIER'] . $admin_secret_key['SECRET_KEY_VALUE']);
+// 加密產生 session
+$session = hash('sha256', $admin_id . $admin_identifier_row['ADMIN_IDENTIFIER'] . $admin_secret_key_row['SECRET_KEY_VALUE']);
 
 // 執行：將新 session 寫入資料庫，並連帶產生到期日
 $time_now = time();
