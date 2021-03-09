@@ -14,10 +14,11 @@ $json_string = file_get_contents("php://input");
 $json_data = json_decode($json_string);
 
 // 執行：根據輸入帳密找出特定登入者
+$admin_password = hash('sha256', $json_data->password);
 $sql_query_admin_account = 'SELECT ADMIN_ID FROM admin WHERE ADMIN_ACCOUNT = ? && ADMIN_PASSWORD = ?';
 $statement_query_admin_account = $pdo->prepare($sql_query_admin_account);
 $statement_query_admin_account->bindParam(1, $json_data->account);
-$statement_query_admin_account->bindParam(2, $json_data->password);
+$statement_query_admin_account->bindParam(2, $admin_password);
 $statement_query_admin_account->execute();
 
 $query_result = $statement_query_admin_account->fetch(PDO::FETCH_ASSOC);
@@ -33,9 +34,8 @@ if ($query_result == null) {
     exit;
 }
 
-$admin_id = $query_result['ADMIN_ID'];
-
 // 執行：根據輸入帳密找出特定登入者及其身分識別號（ADMIN_IDENTIFIER）
+$admin_id = $query_result['ADMIN_ID'];
 $sql_query_admin_identifier = 'SELECT ADMIN_IDENTIFIER FROM admin WHERE ADMIN_ID = ?';
 $statement_query_admin_identifier = $pdo->prepare($sql_query_admin_identifier);
 $statement_query_admin_identifier->bindParam(1, $admin_id);
