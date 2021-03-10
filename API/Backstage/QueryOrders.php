@@ -31,12 +31,16 @@ ON pj.PROJECT_ID = t2.FK_PROJECT_ID_for_BK) as t3
 JOIN members as mb
 ON t3.FK_MEMBER_ID_for_OD = mb.MEMBER_ID
 WHERE
-ORDER_ID like ? && ORDER_DATE like ? && MEMBER_ACCOUNT like ?';
+ORDER_ID like ? && ORDER_DATE like ? && MEMBER_ACCOUNT like ?
+ORDER_MC_NAME like ? && ORDER_MC_PHONE like ? && ORDER_MC_EMAIL like ?';
 
 $statement_query_orders = $pdo->prepare($sql_query_orders);
 $statement_query_orders->bindParam(1, $json_data->orderID);
 $statement_query_orders->bindParam(2, $json_data->orderDate);
 $statement_query_orders->bindParam(3, $json_data->memberAccount);
+$statement_query_orders->bindParam(4, $json_data->ordererName);
+$statement_query_orders->bindParam(5, $json_data->ordererPhone);
+$statement_query_orders->bindParam(6, $json_data->ordererEmail);
 $statement_query_orders->execute();
 
 $query_result = $statement_query_orders->fetchAll(PDO::FETCH_ASSOC);
