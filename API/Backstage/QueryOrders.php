@@ -14,7 +14,7 @@ $json_string = file_get_contents("php://input");
 $json_data = json_decode($json_string);
 
 foreach ($json_data as $properity => $value) {
-    if ($value == '') $json_data->$properity = '%';
+    $json_data->$properity = '%' . $value . '%';
 }
 
 // 執行：
@@ -31,7 +31,7 @@ ON pj.PROJECT_ID = t2.FK_PROJECT_ID_for_BK) as t3
 JOIN members as mb
 ON t3.FK_MEMBER_ID_for_OD = mb.MEMBER_ID
 WHERE
-ORDER_ID like ? && ORDER_DATE like ? && MEMBER_ACCOUNT like ?
+ORDER_ID like ? && ORDER_DATE like ? && MEMBER_ACCOUNT like ? && 
 ORDER_MC_NAME like ? && ORDER_MC_PHONE like ? && ORDER_MC_EMAIL like ?';
 
 $statement_query_orders = $pdo->prepare($sql_query_orders);
