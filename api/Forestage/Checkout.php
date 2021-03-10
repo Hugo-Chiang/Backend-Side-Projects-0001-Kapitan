@@ -7,9 +7,9 @@ header("Content-Type:text/html; charset=utf-8");
 // header('Access-Control-Allow-Methods: GET');
 
 // 導入 PDO 以安全連線資練庫
-include("../Lib/PDO.php");
+include("../../Lib/PDO.php");
 // 導入自定義函式庫
-include("../Lib/Functions.php");
+include("../../Lib/Functions.php");
 
 // 接收前端 JSON 字串資料並解析
 $json_string = file_get_contents("php://input");
