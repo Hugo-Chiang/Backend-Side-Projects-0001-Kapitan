@@ -49,3 +49,16 @@ function insert_max_id($pdo, $table_name)
 
     return $insert_max_id;
 }
+
+// 函式：查詢持有該 session 管理員的等級，並進行回傳
+function check_admin_permissions($pdo, $session)
+{
+    $sql_query_admin_level = 'SELECT ADMIN_LEVEL FROM admin WHERE ADMIN_SESSION = ?';
+    $statement_query_admin_level = $pdo->prepare($sql_query_admin_level);
+    $statement_query_admin_level->bindParam(1, $session);
+    $statement_query_admin_level->execute();
+
+    $query_result = $statement_query_admin_level->fetch(PDO::FETCH_ASSOC);
+
+    return $query_result['ADMIN_LEVEL'];
+}
