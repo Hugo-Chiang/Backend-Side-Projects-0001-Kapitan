@@ -32,6 +32,6 @@ $statement_query_orders = $pdo->prepare($sql_query_orders);
 $statement_query_orders->bindParam(1, $order_id);
 $statement_query_orders->execute();
 
-$query_result = $statement_query_orders->fetch(PDO::FETCH_ASSOC);
+$query_result = $statement_query_orders->fetchAll(PDO::FETCH_ASSOC);
 
 print json_encode($query_result);

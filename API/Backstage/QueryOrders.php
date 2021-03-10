@@ -46,7 +46,7 @@ $statement_query_orders->execute();
 $query_result = $statement_query_orders->fetchAll(PDO::FETCH_ASSOC);
 
 if ($query_result == null) {
-    $query_result = "查無資料！";
+    $query_result = (array)[];
 }
 
 print json_encode($query_result);
