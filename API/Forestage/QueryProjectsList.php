@@ -7,7 +7,7 @@ header("Content-Type:text/html; charset=utf-8");
 
 include("../../Lib/PDO.php");
 
-$sql = "SELECT * FROM PROJECTS";
+$sql = "SELECT PROJECT_ID,PROJECT_NAME,PROJECT_SUMMARY,PROJECT_ORIGINAL_PRICE_PER_PERSON FROM projects";
 
 $result = $pdo->query($sql);
 $data = $result->fetchAll();
