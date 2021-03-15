@@ -15,7 +15,6 @@ $json_data = json_decode($json_string);
 
 // 判斷前端監看的分類是否為全空，全空則等同方案全選，反之則根據所選分類 ID 進行查詢
 if (count($json_data) == 0) {
-
     // 執行：
     $category_id_str = "%%";
     $sql_query_projects_list = "SELECT 
