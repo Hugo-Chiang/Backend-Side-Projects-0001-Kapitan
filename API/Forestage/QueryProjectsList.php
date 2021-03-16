@@ -18,8 +18,8 @@ if (count($json_data) == 0) {
     // 執行：
     $category_id_str = "%%";
     $sql_query_projects_list = "SELECT 
-    PROJECT_ID, PROJECT_NAME, PROJECT_SUMMARY, PROJECT_ORIGINAL_PRICE_PER_PERSON, FK_CATEGORY_ID_for_PJ FROM projects 
-    WHERE FK_CATEGORY_ID_for_PJ LIKE ?";
+    PROJECT_ID, PROJECT_NAME, PROJECT_AVATAR_URL, PROJECT_SUMMARY, PROJECT_ORIGINAL_PRICE_PER_PERSON, PROJECT_MIN_NUM_OF_PEOPLE, 
+    FK_CATEGORY_ID_for_PJ FROM projects WHERE FK_CATEGORY_ID_for_PJ LIKE ? && PROJECT_STATUS != '0'";
     $statement_query_projects_list = $pdo->prepare($sql_query_projects_list);
     $statement_query_projects_list->bindParam(1, $category_id_str);
     $statement_query_projects_list->execute();
@@ -36,8 +36,8 @@ if (count($json_data) == 0) {
 
     // 執行：
     $sql_query_projects_list = "SELECT 
-    PROJECT_ID, PROJECT_NAME, PROJECT_SUMMARY, PROJECT_ORIGINAL_PRICE_PER_PERSON, FK_CATEGORY_ID_for_PJ FROM projects 
-    WHERE FK_CATEGORY_ID_for_PJ IN " . $category_id_str;
+    PROJECT_ID, PROJECT_NAME, PROJECT_AVATAR_URL, PROJECT_SUMMARY, PROJECT_ORIGINAL_PRICE_PER_PERSON, PROJECT_MIN_NUM_OF_PEOPLE, 
+    FK_CATEGORY_ID_for_PJ FROM projects WHERE PROJECT_STATUS != '0' && FK_CATEGORY_ID_for_PJ IN " . $category_id_str;
     $statement_query_projects_list = $pdo->prepare($sql_query_projects_list);
     $statement_query_projects_list->execute();
 }
