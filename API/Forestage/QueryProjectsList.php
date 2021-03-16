@@ -1,10 +1,10 @@
 <?php
 
 // 設定 CORS 權限
-// header("Access-Control-Allow-Origin: *");
-// header("Content-Type:text/html; charset=utf-8");
-header("Access-Control-Allow-Origin: https://fe-sp-0001-kapitan.herokuapp.com");
+header("Access-Control-Allow-Origin: http://localhost:8080/");
+// header("Access-Control-Allow-Origin: https://fe-sp-0001-kapitan.herokuapp.com");
 header('Access-Control-Allow-Methods: POST');
+header("Content-Type:text/html; charset=utf-8");
 
 // 導入 PDO 以安全連線資練庫
 include("../../Lib/PDO.php");
