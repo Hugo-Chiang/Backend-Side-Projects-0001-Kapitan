@@ -10,7 +10,7 @@ include("../../Lib/PDO.php");
 
 $sqlQueryMemberContactInfo =
     "SELECT MEMBER_NAME, MEMBER_PHONE, MEMBER_ACCOUNT, MEMBER_EC_NAME, MEMBER_EC_PHONE, MEMBER_EC_EMAIL 
-FROM members WHERE MEMBER_ID like 'MB0000001'";
+FROM members WHERE MEMBER_ID = 'MB0000001'";
 
 $result = $pdo->query($sqlQueryMemberContactInfo);
 $data = $result->fetchAll();
