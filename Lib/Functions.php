@@ -62,3 +62,5 @@ function check_admin_permissions($pdo, $session)
 
     return $query_result['ADMIN_LEVEL'];
 }
+
+
