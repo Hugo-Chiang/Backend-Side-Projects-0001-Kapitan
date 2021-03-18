@@ -17,8 +17,6 @@ foreach ($json_data as $properity => $value) {
     }
 }
 
-// print json_encode($json_data);
-
 // 執行：
 $sql_query_projects = "SELECT * FROM
 (SELECT * FROM

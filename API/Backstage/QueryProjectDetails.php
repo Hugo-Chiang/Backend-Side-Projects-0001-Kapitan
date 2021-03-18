@@ -8,28 +8,21 @@ include("../../Lib/CORS.php");
 include("../../Lib/PDO.php");
 
 // 接收前端 JSON 字串資料並解析
-$order_id = file_get_contents("php://input");
+$project_id = file_get_contents("php://input");
 
 // 執行：
-$sql_query_orders = 'SELECT * FROM
+$sql_query_project_details = "SELECT * FROM
 (SELECT * FROM
-(SELECT * FROM
-(SELECT * FROM orders as od
-JOIN order_details as odd
-ON od.ORDER_ID = odd.FK_ORDER_ID_for_ODD) as t1
-JOIN booking as bk
-ON bk.FK_ORDER_DETAIL_ID_for_BK = t1.ORDER_DETAIL_ID) as t2
-JOIN projects as pj
-ON pj.PROJECT_ID = t2.FK_PROJECT_ID_for_BK) as t3
-JOIN members as mb
-ON t3.FK_MEMBER_ID_for_OD = mb.MEMBER_ID
-WHERE
-ORDER_ID = ?';
+ (SELECT * FROM projects as pj 
+JOIN departure_location as dl ON 
+pj.FK_LOCATION_ID_for_PJ = dl.LOCATION_ID) as t1 
+JOIN category as cg ON t1.FK_CATEGORY_ID_for_PJ = cg.CATEGORY_ID) as t2 
+WHERE t2.PROJECT_ID = ?";
 
-$statement_query_orders = $pdo->prepare($sql_query_orders);
-$statement_query_orders->bindParam(1, $order_id);
-$statement_query_orders->execute();
+$statement_query_project_details = $pdo->prepare($sql_query_project_details);
+$statement_query_project_details->bindParam(1, $project_id);
+$statement_query_project_details->execute();
 
-$query_result = $statement_query_orders->fetchAll(PDO::FETCH_ASSOC);
+$query_result = $statement_query_project_details->fetch(PDO::FETCH_ASSOC);
 
 print json_encode($query_result);
