@@ -17,6 +17,14 @@ function insert_max_id($pdo, $table_name)
             $table_id_template = 'BK0000000000';
             $table_title = 'BOOKING_ID';
             break;
+        case 'projects':
+            $table_id_template = 'PD0000000';
+            $table_title = 'PROJECT_ID';
+            break;
+        case 'members':
+            $table_id_template = 'MB0000000';
+            $table_title = 'MEMBER_ID';
+            break;
     }
 
     $template_split_arr = str_split($table_id_template);
@@ -62,5 +70,3 @@ function check_admin_permissions($pdo, $session)
 
     return $query_result['ADMIN_LEVEL'];
 }
-
-
