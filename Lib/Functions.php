@@ -18,7 +18,7 @@ function insert_max_id($pdo, $table_name)
             $table_title = 'BOOKING_ID';
             break;
         case 'projects':
-            $table_id_template = 'PD0000000';
+            $table_id_template = 'PJ0000000';
             $table_title = 'PROJECT_ID';
             break;
         case 'members':
