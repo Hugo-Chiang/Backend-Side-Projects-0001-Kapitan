@@ -8,7 +8,7 @@ include("../../Lib/CORS.php");
 include("../../Lib/PDO.php");
 
 // 執行：
-$sql_query_category = "SELECT * FROM category";
+$sql_query_category = "SELECT * FROM category WHERE CATEGORY_VISIBLE_ON_WEB != 0";
 $response_query_category = $pdo->query($sql_query_category);
 $result_query_category = $response_query_category->fetchAll(PDO::FETCH_ASSOC);
 
