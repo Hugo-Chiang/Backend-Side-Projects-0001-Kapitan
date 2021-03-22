@@ -30,7 +30,7 @@ JOIN members as mb
 ON t3.FK_MEMBER_ID_for_OD = mb.MEMBER_ID
 WHERE
 ORDER_ID like ? && ORDER_DATE like ? && MEMBER_ACCOUNT like ? && 
-ORDER_MC_NAME like ? && ORDER_MC_PHONE like ? && ORDER_MC_EMAIL like ? && t3.PROJECT_VISIBLE_ON_WEB != 0';
+ORDER_MC_NAME like ? && ORDER_MC_PHONE like ? && ORDER_MC_EMAIL like ? && ORDER_VISIBLE_ON_WEB != 0';
 
 $statement_query_orders = $pdo->prepare($sql_query_orders);
 $statement_query_orders->bindParam(1, $json_data->orderID);

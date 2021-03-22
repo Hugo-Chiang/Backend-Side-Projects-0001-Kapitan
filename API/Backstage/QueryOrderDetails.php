@@ -11,7 +11,7 @@ include("../../Lib/PDO.php");
 $order_id = file_get_contents("php://input");
 
 // 執行：
-$sql_query_orders = 'SELECT * FROM
+$sql_query_order_details = 'SELECT * FROM
 (SELECT * FROM
 (SELECT * FROM
 (SELECT * FROM orders as od
@@ -24,12 +24,12 @@ ON pj.PROJECT_ID = t2.FK_PROJECT_ID_for_BK) as t3
 JOIN members as mb
 ON t3.FK_MEMBER_ID_for_OD = mb.MEMBER_ID
 WHERE
-ORDER_ID = ?';
+ORDER_ID = ? && ORDER_DETAIL_VISIBLE_ON_WEB != 0';
 
-$statement_query_orders = $pdo->prepare($sql_query_orders);
-$statement_query_orders->bindParam(1, $order_id);
-$statement_query_orders->execute();
+$statement_query_order_details = $pdo->prepare($sql_query_order_details);
+$statement_query_order_details->bindParam(1, $order_id);
+$statement_query_order_details->execute();
 
-$query_result = $statement_query_orders->fetchAll(PDO::FETCH_ASSOC);
+$query_result = $statement_query_order_details->fetchAll(PDO::FETCH_ASSOC);
 
 print json_encode($query_result);
