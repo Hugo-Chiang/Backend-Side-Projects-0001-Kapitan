@@ -27,7 +27,7 @@ if ($admin_level > 2) {
     // 執行：查詢欲轉單的對象是否存在
     $sql_query_order = "SELECT * FROM orders WHERE ORDER_ID = ? && ORDER_VISIBLE_ON_WEB != 0";
     $statement_query_order = $pdo->prepare($sql_query_order);
-    $statement_query_order->bindParam(1, $edited_details->orderID);
+    $statement_query_order->bindParam(1, $edited_details->newOrderID);
     $statement_query_order->execute();
 
     $query_result = $statement_query_order->fetch(PDO::FETCH_ASSOC);
@@ -53,7 +53,7 @@ if ($admin_level > 2) {
         $statement_update_order_details->bindParam(8, $edited_details->ECemail);
         $statement_update_order_details->bindParam(9, $edited_details->projectID);
         $statement_update_order_details->bindParam(10, $edited_details->bookingDate);
-        $statement_update_order_details->bindParam(11, $edited_details->orderID);
+        $statement_update_order_details->bindParam(11, $edited_details->newOrderID);
         $statement_update_order_details->bindParam(12, $edited_details->orderDetailID);
         $statement_update_order_details->execute();
 
@@ -65,7 +65,7 @@ if ($admin_level > 2) {
         WHERE t1.ORDER_ID = ? && t1.ORDER_VISIBLE_ON_WEB != 0 && t1.ORDER_DETAIL_VISIBLE_ON_WEB != 0 
         GROUP BY t1.ORDER_ID";
         $statement_query_order_new_amount = $pdo->prepare($sql_query_order_new_amount);
-        $statement_query_order_new_amount->bindParam(1, $edited_details->orderID);
+        $statement_query_order_new_amount->bindParam(1, $edited_details->newOrderID);
         $statement_query_order_new_amount->execute();
 
         $query_result = $statement_query_order_new_amount->fetch(PDO::FETCH_ASSOC);
@@ -75,11 +75,11 @@ if ($admin_level > 2) {
         WHERE ORDER_ID = ? && ORDER_VISIBLE_ON_WEB != 0";
         $statement_update_order_amount = $pdo->prepare($sql_update_order_amount);
         $statement_update_order_amount->bindParam(1, $order_new_amount);
-        $statement_update_order_amount->bindParam(2, $edited_details->orderID);
+        $statement_update_order_amount->bindParam(2, $edited_details->newOrderID);
         $statement_update_order_amount->execute();
 
         echo $edited_details->orderDetailID . ' 細項修改完成了！';
     } else {
-        echo $edited_details->orderID . ' 訂單不存在。請再檢查一次。';
+        echo $edited_details->newOrderID . ' 訂單不存在。請再檢查一次。';
     }
 }
