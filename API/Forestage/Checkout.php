@@ -17,7 +17,7 @@ $json_data = json_decode($json_string);
 $member_id = $json_data->memberID;
 $orderer_contact_info_arr = $json_data->ordererContactInfo;
 $order_details_arr = $json_data->orderDetails;
-$discount = $json_data->discount || 0;
+$discount = 0;
 $visible = 1;
 
 // 執行：查詢結帳內容是否包含已預約的內容（購物車階段被人截胡）
