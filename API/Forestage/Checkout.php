@@ -13,10 +13,12 @@ include("../../Lib/Functions.php");
 $json_string = file_get_contents("php://input");
 $json_data = json_decode($json_string);
 
-// 以變數接收關鍵資料，以利後續操作
+// 新建變數或接收關鍵資料，以利後續操作
 $member_id = $json_data->memberID;
 $orderer_contact_info_arr = $json_data->ordererContactInfo;
 $order_details_arr = $json_data->orderDetails;
+$discount = $json_data->discount || 0;
+$visible = 1;
 
 // 執行：查詢結帳內容是否包含已預約的內容（購物車階段被人截胡）
 $alerady_booking_arr = [];
@@ -50,8 +52,23 @@ if (count($alerady_booking_arr) > 0) {
     print json_encode($return_obj);
 } else {
 
-    // 命名變數，以便建立或找出未被「刪除」（網站意義）的資料
-    $visible = 1;
+    // 執行：查詢方案價格並計算訂單金額（不仰賴前端送來的金額資訊，降低風險）
+    $total_amount = 0;
+
+    for ($i = 0; $i < count($order_details_arr); $i++) {
+        $booking_project_id = $order_details_arr[$i]->bookingProjectID;
+        $booking_num_of_people = $order_details_arr[$i]->bookingProjectNumOfPeople;
+
+        $sql_query_project_price = "SELECT PROJECT_ORIGINAL_PRICE_PER_PERSON FROM projects WHERE PROJECT_ID = ?";
+        $statement_query_project_price = $pdo->prepare($sql_query_project_price);
+        $statement_query_project_price->bindParam(1, $booking_project_id);
+        $statement_query_project_price->execute();
+
+        $query_result = $statement_query_project_price->fetch(PDO::FETCH_ASSOC);
+        $project_price = $query_result['PROJECT_ORIGINAL_PRICE_PER_PERSON'];
+
+        $total_amount += $project_price * $booking_num_of_people;
+    }
 
     // 執行：判斷並寫入最新訂單編號
     $insert_order_id = insert_max_id($pdo, 'orders');
@@ -60,55 +77,72 @@ if (count($alerady_booking_arr) > 0) {
     orders(ORDER_ID, ORDER_DATE, ORDER_TOTAL_CONSUMPTION, ORDER_TOTAL_DISCOUNT, 
     ORDER_MC_NAME, ORDER_MC_PHONE, ORDER_MC_EMAIL, 
     ORDER_EC_NAME, ORDER_EC_PHONE, ORDER_EC_EMAIL, ORDER_VISIBLE_ON_WEB, FK_MEMBER_ID_for_OD) 
-    VALUES (?, NOW(),'20000','0', ?, ?, ?, ?, ?, ?, ?, ?)";
+    VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     // 執行：訂單寫入 orders 表格
     $statement_insert_order = $pdo->prepare($sql_insert_order);
     $statement_insert_order->bindParam(1, $insert_order_id);
-    $statement_insert_order->bindParam(2, $orderer_contact_info_arr->MCname);
-    $statement_insert_order->bindParam(3, $orderer_contact_info_arr->MCphone);
-    $statement_insert_order->bindParam(4, $orderer_contact_info_arr->MCemail);
-    $statement_insert_order->bindParam(5, $orderer_contact_info_arr->ECname);
-    $statement_insert_order->bindParam(6, $orderer_contact_info_arr->ECphone);
-    $statement_insert_order->bindParam(7, $orderer_contact_info_arr->ECemail);
-    $statement_insert_order->bindParam(8, $visible);
-    $statement_insert_order->bindParam(9, $member_id);
+    $statement_insert_order->bindParam(2, $total_amount);
+    $statement_insert_order->bindParam(3, $discount);
+    $statement_insert_order->bindParam(4, $orderer_contact_info_arr->MCname);
+    $statement_insert_order->bindParam(5, $orderer_contact_info_arr->MCphone);
+    $statement_insert_order->bindParam(6, $orderer_contact_info_arr->MCemail);
+    $statement_insert_order->bindParam(7, $orderer_contact_info_arr->ECname);
+    $statement_insert_order->bindParam(8, $orderer_contact_info_arr->ECphone);
+    $statement_insert_order->bindParam(9, $orderer_contact_info_arr->ECemail);
+    $statement_insert_order->bindParam(10, $visible);
+    $statement_insert_order->bindParam(11, $member_id);
     $statement_insert_order->execute();
 
     // 執行：訂單細項寫入 order_details 表格，同時預約紀錄寫入 booking 表格
     for ($i = 0; $i < count($order_details_arr); $i++) {
 
+        $booking_project_id = $order_details_arr[$i]->bookingProjectID;
+        $booking_num_of_people = $order_details_arr[$i]->bookingProjectNumOfPeople;
+
+        $sql_query_project_price = "SELECT PROJECT_ORIGINAL_PRICE_PER_PERSON FROM projects WHERE PROJECT_ID = ?";
+        $statement_query_project_price = $pdo->prepare($sql_query_project_price);
+        $statement_query_project_price->bindParam(1, $booking_project_id);
+        $statement_query_project_price->execute();
+
+        $query_result = $statement_query_project_price->fetch(PDO::FETCH_ASSOC);
+        $project_price = $query_result['PROJECT_ORIGINAL_PRICE_PER_PERSON'];
+
+        $order_details_amount = $project_price * $booking_num_of_people;
+
         $sql_instert_order_detail = "INSERT INTO order_details 
         (ORDER_DETAIL_ID, ORDER_DETAIL_AMOUNT, ORDER_DETAIL_MC_NAME, ORDER_DETAIL_MC_PHONE, ORDER_DETAIL_MC_EMAIL, 
         ORDER_DETAIL_EC_NAME, ORDER_DETAIL_EC_PHONE, ORDER_DETAIL_EC_EMAIL, ORDER_DETAIL_VISIBLE_ON_WEB, FK_ORDER_ID_for_ODD) 
-        VALUES (?, '20000', ?, ?, ?, ?, ?, ?, ?, ?)";
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $insert_order_detail_id = insert_max_id($pdo, 'order_details');
 
         $statement_instert_order_detail = $pdo->prepare($sql_instert_order_detail);
         $statement_instert_order_detail->bindParam(1, $insert_order_detail_id);
-        $statement_instert_order_detail->bindParam(2, $order_details_arr[$i]->MCname);
-        $statement_instert_order_detail->bindParam(3, $order_details_arr[$i]->MCphone);
-        $statement_instert_order_detail->bindParam(4, $order_details_arr[$i]->MCemail);
-        $statement_instert_order_detail->bindParam(5, $order_details_arr[$i]->ECname);
-        $statement_instert_order_detail->bindParam(6, $order_details_arr[$i]->ECphone);
-        $statement_instert_order_detail->bindParam(7, $order_details_arr[$i]->ECemail);
-        $statement_instert_order_detail->bindParam(8, $visible);
-        $statement_instert_order_detail->bindParam(9, $insert_order_id);
+        $statement_instert_order_detail->bindParam(2, $order_details_amount);
+        $statement_instert_order_detail->bindParam(3, $order_details_arr[$i]->MCname);
+        $statement_instert_order_detail->bindParam(4, $order_details_arr[$i]->MCphone);
+        $statement_instert_order_detail->bindParam(5, $order_details_arr[$i]->MCemail);
+        $statement_instert_order_detail->bindParam(6, $order_details_arr[$i]->ECname);
+        $statement_instert_order_detail->bindParam(7, $order_details_arr[$i]->ECphone);
+        $statement_instert_order_detail->bindParam(8, $order_details_arr[$i]->ECemail);
+        $statement_instert_order_detail->bindParam(9, $visible);
+        $statement_instert_order_detail->bindParam(10, $insert_order_id);
         $statement_instert_order_detail->execute();
 
         $sql_insert_booking = "INSERT INTO 
-        booking(BOOKING_ID, BOOKING_DATE, BOOKING_VISIBLE_ON_WEB, FK_PROJECT_ID_for_BK, FK_ORDER_DETAIL_ID_for_BK) 
-        VALUES (?, ?, ?, ?, ?)";
+        booking(BOOKING_ID, BOOKING_DATE, BOOKING_NUM_OF_PEOPLE, BOOKING_VISIBLE_ON_WEB, FK_PROJECT_ID_for_BK, FK_ORDER_DETAIL_ID_for_BK) 
+        VALUES (?, ?, ?, ?, ?, ?)";
 
         $insert_booking_id = insert_max_id($pdo, 'booking');
 
         $statement_insert_booking = $pdo->prepare($sql_insert_booking);
         $statement_insert_booking->bindParam(1, $insert_booking_id);
         $statement_insert_booking->bindParam(2, $order_details_arr[$i]->bookingProjectDate);
-        $statement_insert_booking->bindParam(3, $visible);
-        $statement_insert_booking->bindParam(4, $order_details_arr[$i]->bookingProjectID);
-        $statement_insert_booking->bindParam(5, $insert_order_detail_id);
+        $statement_insert_booking->bindParam(3, $booking_num_of_people);
+        $statement_insert_booking->bindParam(4, $visible);
+        $statement_insert_booking->bindParam(5, $order_details_arr[$i]->bookingProjectID);
+        $statement_insert_booking->bindParam(6, $insert_order_detail_id);
         $statement_insert_booking->execute();
     }
 
