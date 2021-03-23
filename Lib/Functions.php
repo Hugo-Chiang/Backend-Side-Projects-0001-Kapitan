@@ -58,6 +58,33 @@ function insert_max_id($pdo, $table_name)
     return $insert_max_id;
 }
 
+// 函式：根據傳入的表格名稱，判斷並寫入最新編號
+function find_out_serial($table_name, $id)
+{
+
+    switch ($table_name) {
+        case 'orders':
+            $prefix = 'OD';
+            break;
+        case 'order_details':
+            $prefix = 'ODD';
+            break;
+        case 'booking':
+            $prefix = 'BK';
+            break;
+        case 'projects':
+            $prefix = 'PJ';
+            break;
+        case 'members':
+            $prefix = 'MB';
+            break;
+    }
+
+    $id_serial = (int)substr($id, strlen($prefix));
+
+    return $id_serial;
+}
+
 // 函式：查詢持有該 session 管理員的等級，並進行回傳
 function check_admin_permissions($pdo, $session)
 {

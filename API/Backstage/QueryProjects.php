@@ -6,6 +6,8 @@ include("../../Lib/CORS.php");
 
 // 導入 PDO 以安全連線資練庫
 include("../../Lib/PDO.php");
+// 導入自定義函式庫
+include("../../Lib/Functions.php");
 
 // 接收前端 JSON 字串資料並解析
 $json_string = file_get_contents("php://input");
@@ -40,6 +42,11 @@ $query_result = $statement_query_projects->fetchAll(PDO::FETCH_ASSOC);
 
 if ($query_result == null) {
     $query_result = (array)[];
+} else {
+    foreach ($query_result as $index => $sub_arr) {
+        $sort_index = find_out_serial('projects', $sub_arr['PROJECT_ID']) - 1;
+        $query_result[$index]['SORT_INDEX'] = $sort_index;
+    }
 }
 
 print json_encode($query_result);
