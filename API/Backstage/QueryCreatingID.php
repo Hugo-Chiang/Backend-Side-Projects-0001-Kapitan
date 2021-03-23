@@ -16,6 +16,9 @@ switch ($path_string) {
     case 'Orders-Manager':
         $table_name = 'orders';
         break;
+    case 'Order-Details':
+        $table_name = 'order_details';
+        break;
     case 'Projects-Manager':
         $table_name = 'projects';
         break;
