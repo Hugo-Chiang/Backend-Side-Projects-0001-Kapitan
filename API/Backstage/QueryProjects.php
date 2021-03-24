@@ -44,7 +44,7 @@ if ($query_result == null) {
     $query_result = (array)[];
 } else {
     foreach ($query_result as $index => $sub_arr) {
-        $sort_index = find_out_serial('projects', $sub_arr['PROJECT_ID']) - 1;
+        $sort_index = find_out_serial('projects', $sub_arr['PROJECT_ID']);
         $query_result[$index]['SORT_INDEX'] = $sort_index;
     }
 }
