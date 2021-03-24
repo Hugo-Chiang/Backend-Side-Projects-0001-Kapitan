@@ -25,7 +25,20 @@ if ($admin_level > 2) {
     echo '您的權限不足以執行這項操作！';
 } else {
 
-    $member_password = hash('sha256', $edited_details->memberPassword);
+    if ($edited_details->reSetPassword == '') {
+
+        $sql_query_password = "SELECT MEMBER_PASSWORD FROM members WHERE MEMBER_ID = ? && MEMBER_VISIBLE_ON_WEB != 0";
+        $statement_query_password = $pdo->prepare($sql_query_password);
+        $statement_query_password->bindParam(1, $member_id);
+        $statement_query_password->execute();
+
+        $query_result = $statement_query_password->fetch(PDO::FETCH_ASSOC);
+
+        $member_password = $query_result['MEMBER_PASSWORD'];
+    } else {
+
+        $member_password = hash('sha256', $edited_details->memberPassword);
+    }
 
     $sql_update_member_info = "UPDATE members SET 
     MEMBER_REGISTERED_DATE = ?, MEMBER_STATUS = ?, MEMBER_ACCOUNT = ?, MEMBER_PASSWORD = ?, 

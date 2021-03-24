@@ -37,26 +37,26 @@ if ($admin_level > 2) {
         $order_id = insert_max_id($pdo, 'orders');
         $visible = 1;
 
-        $sql_insert_project_details = "INSERT INTO orders 
+        $sql_insert_order_data = "INSERT INTO orders 
         (ORDER_ID, ORDER_STATUS, ORDER_DATE, ORDER_TOTAL_CONSUMPTION, ORDER_TOTAL_DISCOUNT, 
         ORDER_MC_NAME, ORDER_MC_PHONE, ORDER_MC_EMAIL, 
         ORDER_EC_NAME, ORDER_EC_PHONE, ORDER_EC_EMAIL, ORDER_VISIBLE_ON_WEB, FK_MEMBER_ID_for_OD) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $statement_insert_project_details = $pdo->prepare($sql_insert_project_details);
-        $statement_insert_project_details->bindParam(1, $order_id);
-        $statement_insert_project_details->bindParam(2, $edited_details->orderStatus);
-        $statement_insert_project_details->bindParam(3, $edited_details->orderDate);
-        $statement_insert_project_details->bindParam(4, $edited_details->orderTotalConsumption);
-        $statement_insert_project_details->bindParam(5, $edited_details->orderTotalDiscount);
-        $statement_insert_project_details->bindParam(6, $edited_details->MCname);
-        $statement_insert_project_details->bindParam(7, $edited_details->MCphone);
-        $statement_insert_project_details->bindParam(8, $edited_details->MCemail);
-        $statement_insert_project_details->bindParam(9, $edited_details->ECname);
-        $statement_insert_project_details->bindParam(10, $edited_details->ECphone);
-        $statement_insert_project_details->bindParam(11, $edited_details->ECemail);
-        $statement_insert_project_details->bindParam(12, $visible);
-        $statement_insert_project_details->bindParam(13, $edited_details->memberID);
-        $statement_insert_project_details->execute();
+        $statement_insert_order_data = $pdo->prepare($sql_insert_order_data);
+        $statement_insert_order_data->bindParam(1, $order_id);
+        $statement_insert_order_data->bindParam(2, $edited_details->orderStatus);
+        $statement_insert_order_data->bindParam(3, $edited_details->orderDate);
+        $statement_insert_order_data->bindParam(4, $edited_details->orderTotalConsumption);
+        $statement_insert_order_data->bindParam(5, $edited_details->orderTotalDiscount);
+        $statement_insert_order_data->bindParam(6, $edited_details->MCname);
+        $statement_insert_order_data->bindParam(7, $edited_details->MCphone);
+        $statement_insert_order_data->bindParam(8, $edited_details->MCemail);
+        $statement_insert_order_data->bindParam(9, $edited_details->ECname);
+        $statement_insert_order_data->bindParam(10, $edited_details->ECphone);
+        $statement_insert_order_data->bindParam(11, $edited_details->ECemail);
+        $statement_insert_order_data->bindParam(12, $visible);
+        $statement_insert_order_data->bindParam(13, $edited_details->memberID);
+        $statement_insert_order_data->execute();
 
         echo '訂單 ' . $order_id . ' 新增完成了！';
     } else {
