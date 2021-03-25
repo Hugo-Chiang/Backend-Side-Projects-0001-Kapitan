@@ -76,7 +76,7 @@ $query_result = $statement_query_admin_signedin_data->fetch(PDO::FETCH_ASSOC);
 $return_obj = (object)[
     'singInStatus' => true,
     'session' => $query_result['ADMIN_SESSION'],
-    'expDate' => $query_result['ADMIN_SIGNIN_TIMEOUT']
+    'expDate' => $query_result['ADMIN_SIGNIN_TIMEOUT'],
 ];
 
 print json_encode($return_obj);
