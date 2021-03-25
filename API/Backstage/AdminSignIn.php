@@ -1,7 +1,7 @@
 <?php
 
 // 導入並設定 CORS 權限
-$allow_methods = 'GET';
+$allow_methods = 'POST';
 include("../../Lib/CORS.php");
 
 // 導入 PDO 以安全連線資練庫
