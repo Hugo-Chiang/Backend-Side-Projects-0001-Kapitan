@@ -37,7 +37,7 @@ $statement_update_signin_authn->execute();
 
 $return_obj = (object)[
     'sessionCheck' => true,
-    // 'message' => '歡迎回來，' . $query_result['MEMBER_NAME'],
+    'signInedID' => $query_result['MEMBER_ID'],
 ];
 
 print json_encode($return_obj);
