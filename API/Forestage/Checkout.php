@@ -72,26 +72,28 @@ if (count($alerady_booking_arr) > 0) {
 
     // 執行：判斷並寫入最新訂單編號
     $insert_order_id = insert_max_id($pdo, 'orders');
+    $order_status = 1;
 
     $sql_insert_order = "INSERT INTO 
-    orders(ORDER_ID, ORDER_DATE, ORDER_TOTAL_CONSUMPTION, ORDER_TOTAL_DISCOUNT, 
+    orders(ORDER_ID, ORDER_STATUS, ORDER_DATE, ORDER_TOTAL_CONSUMPTION, ORDER_TOTAL_DISCOUNT, 
     ORDER_MC_NAME, ORDER_MC_PHONE, ORDER_MC_EMAIL, 
     ORDER_EC_NAME, ORDER_EC_PHONE, ORDER_EC_EMAIL, ORDER_VISIBLE_ON_WEB, FK_MEMBER_ID_for_OD) 
-    VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    VALUES (?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     // 執行：訂單寫入 orders 表格
     $statement_insert_order = $pdo->prepare($sql_insert_order);
     $statement_insert_order->bindParam(1, $insert_order_id);
-    $statement_insert_order->bindParam(2, $total_amount);
-    $statement_insert_order->bindParam(3, $discount);
-    $statement_insert_order->bindParam(4, $orderer_contact_info_arr->MCname);
-    $statement_insert_order->bindParam(5, $orderer_contact_info_arr->MCphone);
-    $statement_insert_order->bindParam(6, $orderer_contact_info_arr->MCemail);
-    $statement_insert_order->bindParam(7, $orderer_contact_info_arr->ECname);
-    $statement_insert_order->bindParam(8, $orderer_contact_info_arr->ECphone);
-    $statement_insert_order->bindParam(9, $orderer_contact_info_arr->ECemail);
-    $statement_insert_order->bindParam(10, $visible);
-    $statement_insert_order->bindParam(11, $member_id);
+    $statement_insert_order->bindParam(2, $order_status);
+    $statement_insert_order->bindParam(3, $total_amount);
+    $statement_insert_order->bindParam(4, $discount);
+    $statement_insert_order->bindParam(5, $orderer_contact_info_arr->MCname);
+    $statement_insert_order->bindParam(6, $orderer_contact_info_arr->MCphone);
+    $statement_insert_order->bindParam(7, $orderer_contact_info_arr->MCemail);
+    $statement_insert_order->bindParam(8, $orderer_contact_info_arr->ECname);
+    $statement_insert_order->bindParam(9, $orderer_contact_info_arr->ECphone);
+    $statement_insert_order->bindParam(10, $orderer_contact_info_arr->ECemail);
+    $statement_insert_order->bindParam(11, $visible);
+    $statement_insert_order->bindParam(12, $member_id);
     $statement_insert_order->execute();
 
     // 執行：訂單細項寫入 order_details 表格，同時預約紀錄寫入 booking 表格
@@ -111,23 +113,25 @@ if (count($alerady_booking_arr) > 0) {
         $order_details_amount = $project_price * $booking_num_of_people;
 
         $sql_instert_order_detail = "INSERT INTO order_details 
-        (ORDER_DETAIL_ID, ORDER_DETAIL_AMOUNT, ORDER_DETAIL_MC_NAME, ORDER_DETAIL_MC_PHONE, ORDER_DETAIL_MC_EMAIL, 
+        (ORDER_DETAIL_ID, ORDER_DETAIL_STATUS, ORDER_DETAIL_AMOUNT, ORDER_DETAIL_MC_NAME, ORDER_DETAIL_MC_PHONE, ORDER_DETAIL_MC_EMAIL, 
         ORDER_DETAIL_EC_NAME, ORDER_DETAIL_EC_PHONE, ORDER_DETAIL_EC_EMAIL, ORDER_DETAIL_VISIBLE_ON_WEB, FK_ORDER_ID_for_ODD) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $insert_order_detail_id = insert_max_id($pdo, 'order_details');
+        $order_detail_status = 1;
 
         $statement_instert_order_detail = $pdo->prepare($sql_instert_order_detail);
         $statement_instert_order_detail->bindParam(1, $insert_order_detail_id);
-        $statement_instert_order_detail->bindParam(2, $order_details_amount);
-        $statement_instert_order_detail->bindParam(3, $order_details_arr[$i]->MCname);
-        $statement_instert_order_detail->bindParam(4, $order_details_arr[$i]->MCphone);
-        $statement_instert_order_detail->bindParam(5, $order_details_arr[$i]->MCemail);
-        $statement_instert_order_detail->bindParam(6, $order_details_arr[$i]->ECname);
-        $statement_instert_order_detail->bindParam(7, $order_details_arr[$i]->ECphone);
-        $statement_instert_order_detail->bindParam(8, $order_details_arr[$i]->ECemail);
-        $statement_instert_order_detail->bindParam(9, $visible);
-        $statement_instert_order_detail->bindParam(10, $insert_order_id);
+        $statement_instert_order_detail->bindParam(2, $order_detail_status);
+        $statement_instert_order_detail->bindParam(3, $order_details_amount);
+        $statement_instert_order_detail->bindParam(4, $order_details_arr[$i]->MCname);
+        $statement_instert_order_detail->bindParam(5, $order_details_arr[$i]->MCphone);
+        $statement_instert_order_detail->bindParam(6, $order_details_arr[$i]->MCemail);
+        $statement_instert_order_detail->bindParam(7, $order_details_arr[$i]->ECname);
+        $statement_instert_order_detail->bindParam(8, $order_details_arr[$i]->ECphone);
+        $statement_instert_order_detail->bindParam(9, $order_details_arr[$i]->ECemail);
+        $statement_instert_order_detail->bindParam(10, $visible);
+        $statement_instert_order_detail->bindParam(11, $insert_order_id);
         $statement_instert_order_detail->execute();
 
         $sql_insert_booking = "INSERT INTO 
