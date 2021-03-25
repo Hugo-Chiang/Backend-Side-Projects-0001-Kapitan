@@ -32,6 +32,8 @@ if ($query_result == null) {
     exit;
 }
 
+$member_id = $query_result['MEMBER_ID'];
+
 // 執行：選出會員登入所用的密鑰，以利建立登入驗證用的 session
 $para = 'members';
 $sql_query_secret_key = 'SELECT SECRET_KEY_VALUE FROM secret_keys WHERE SECRET_KEY_USAGE = ?';
@@ -49,7 +51,7 @@ $time_now = time();
 $exp_time = $time_now + (60 * 60 * 24 * 3);
 $exp_time = date("Y-m-d H:i:s", $exp_time);
 
-$sql_update_new_session = 'UPDATE member SET MEMBER_SESSION = ?, MEMBER_SIGNIN_TIMEOUT = ? WHERE MEMBER_ID = ?';
+$sql_update_new_session = 'UPDATE members SET MEMBER_SESSION = ?, MEMBER_SIGNIN_TIMEOUT = ? WHERE MEMBER_ID = ?';
 $statement_update_new_session = $pdo->prepare($sql_update_new_session);
 $statement_update_new_session->bindParam(1, $session);
 $statement_update_new_session->bindParam(2, $exp_time);
