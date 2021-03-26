@@ -10,7 +10,7 @@ include("../../Lib/PDO.php");
 // 接收前端 JSON 字串資料並解析
 $order_id = file_get_contents("php://input");
 
-// 執行：
+// 執行：根據前端送來的會員編號，回傳其近 90 天的所有非刪除訂單
 $sql_query_order_details = 'SELECT * FROM
 (SELECT * FROM
 (SELECT * FROM
@@ -24,7 +24,8 @@ ON pj.PROJECT_ID = t2.FK_PROJECT_ID_for_BK) as t3
 JOIN members as mb
 ON t3.FK_MEMBER_ID_for_OD = mb.MEMBER_ID
 WHERE
-MEMBER_ID = ? && ORDER_DETAIL_VISIBLE_ON_WEB != 0';
+MEMBER_ID = ? 
+&& ORDER_DETAIL_VISIBLE_ON_WEB != 0 && datediff(ORDER_DATE, NOW()) >= -90';
 
 $statement_query_order_details = $pdo->prepare($sql_query_order_details);
 $statement_query_order_details->bindParam(1, $order_id);
