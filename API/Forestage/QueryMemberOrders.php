@@ -12,17 +12,20 @@ $order_id = file_get_contents("php://input");
 
 // 執行：根據前端送來的會員編號，回傳其近 90 天的所有非刪除訂單
 $sql_query_order_details = 'SELECT * FROM
-(SELECT * FROM
-(SELECT * FROM
-(SELECT * FROM orders as od
-JOIN order_details as odd
+(SELECT * FROM 
+(SELECT * FROM 
+(SELECT * FROM 
+(SELECT * FROM 
+orders as od JOIN order_details as odd
 ON od.ORDER_ID = odd.FK_ORDER_ID_for_ODD) as t1
-JOIN booking as bk
+JOIN booking as bk 
 ON bk.FK_ORDER_DETAIL_ID_for_BK = t1.ORDER_DETAIL_ID) as t2
 JOIN projects as pj
 ON pj.PROJECT_ID = t2.FK_PROJECT_ID_for_BK) as t3
-JOIN members as mb
-ON t3.FK_MEMBER_ID_for_OD = mb.MEMBER_ID
+JOIN departure_location as dl 
+ON dl.LOCATION_ID = t3.FK_LOCATION_ID_for_PJ) as t4
+JOIN members as mb 
+ON t4.FK_MEMBER_ID_for_OD = mb.MEMBER_ID
 WHERE
 MEMBER_ID = ? 
 && ORDER_DETAIL_VISIBLE_ON_WEB != 0 && datediff(ORDER_DATE, NOW()) >= -90';
