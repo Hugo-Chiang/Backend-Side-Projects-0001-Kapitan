@@ -56,5 +56,5 @@ if ($session == $query_result['MEMBER_SESSION']) {
     }
 } else {
 
-    echo '驗證資訊不正確！建議您重新登入，再試一次。';
+    echo '驗證資訊不正確！請您重新登入，再試一次。';
 }
