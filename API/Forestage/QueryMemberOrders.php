@@ -8,7 +8,8 @@ include("../../Lib/CORS.php");
 include("../../Lib/PDO.php");
 
 // 接收前端 JSON 字串資料並解析
-$order_id = file_get_contents("php://input");
+$json_string = file_get_contents("php://input");
+$json_data = json_decode($json_string);
 
 // 執行：根據前端送來的會員編號，回傳其近 90 天的所有非刪除訂單
 $sql_query_order_details = 'SELECT * FROM
@@ -27,11 +28,12 @@ ON dl.LOCATION_ID = t3.FK_LOCATION_ID_for_PJ) as t4
 JOIN members as mb 
 ON t4.FK_MEMBER_ID_for_OD = mb.MEMBER_ID
 WHERE
-MEMBER_ID = ? 
+MEMBER_ID = ? && ORDER_STATUS LIKE ? 
 && ORDER_DETAIL_VISIBLE_ON_WEB != 0 && datediff(ORDER_DATE, NOW()) >= -90';
 
 $statement_query_order_details = $pdo->prepare($sql_query_order_details);
-$statement_query_order_details->bindParam(1, $order_id);
+$statement_query_order_details->bindParam(1, $json_data->memberID);
+$statement_query_order_details->bindParam(2, $json_data->orderStatus);
 $statement_query_order_details->execute();
 
 $query_result = $statement_query_order_details->fetchAll(PDO::FETCH_ASSOC);
