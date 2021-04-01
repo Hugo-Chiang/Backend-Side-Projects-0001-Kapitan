@@ -65,7 +65,7 @@ if ($admin_level > 2) {
 
     if (!$data_error) {
 
-        // 執行：更新訂單細項內容
+        // 執行：根據輸入資料更新訂單細項內容
         $sql_update_order_details = "UPDATE order_details as odd JOIN booking as bk 
         ON bk.FK_ORDER_DETAIL_ID_for_BK = odd.ORDER_DETAIL_ID SET 
         odd.ORDER_DETAIL_STATUS = ?, odd.ORDER_DETAIL_AMOUNT = ?, 

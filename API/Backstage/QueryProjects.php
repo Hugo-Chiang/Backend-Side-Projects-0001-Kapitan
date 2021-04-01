@@ -19,7 +19,7 @@ foreach ($json_data as $properity => $value) {
     }
 }
 
-// 執行：
+// 執行：根據關鍵詞查詢相關方案
 $sql_query_projects = "SELECT * FROM
 (SELECT * FROM
  (SELECT * FROM projects as pj 

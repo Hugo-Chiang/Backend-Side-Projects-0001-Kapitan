@@ -25,6 +25,7 @@ if ($admin_level > 2) {
     echo '您的權限不足以執行這項操作！';
 } else {
 
+    // 執行：根據輸入資料更新訂單資料
     $sql_update_order_data = "UPDATE orders SET 
     ORDER_STATUS = ?, ORDER_DATE = ?, ORDER_TOTAL_CONSUMPTION = ?, ORDER_TOTAL_DISCOUNT = ?, ORDER_MC_NAME = ?, 
     ORDER_MC_PHONE = ?, ORDER_MC_EMAIL = ?, ORDER_EC_NAME = ?, ORDER_EC_PHONE = ?, ORDER_EC_EMAIL = ?, FK_MEMBER_ID_for_OD = ? 

@@ -29,8 +29,9 @@ if ($admin_level > 2) {
 
     $sql_insert_project_details = "INSERT INTO projects 
     (PROJECT_ID, PROJECT_STATUS, PROJECT_NAME, PROJECT_AVATAR_URL, PROJECT_CAROUSEL_URL, PROJECT_ORIGINAL_PRICE_PER_PERSON, 
-    PROJECT_MIN_NUM_OF_PEOPLE, PROJECT_SUMMARY, PROJECT_DESCRIPITION, PROJECT_VISIBLE_ON_WEB, FK_CATEGORY_ID_for_PJ, FK_LOCATION_ID_for_PJ) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    PROJECT_MIN_NUM_OF_PEOPLE, PROJECT_MAX_NUM_OF_PEOPLE, PROJECT_SUMMARY, PROJECT_DESCRIPITION, PROJECT_VISIBLE_ON_WEB, 
+    FK_CATEGORY_ID_for_PJ, FK_LOCATION_ID_for_PJ) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $statement_insert_project_details = $pdo->prepare($sql_insert_project_details);
     $statement_insert_project_details->bindParam(1, $project_id);
     $statement_insert_project_details->bindParam(2, $edited_details->projectStatus);
@@ -39,11 +40,12 @@ if ($admin_level > 2) {
     $statement_insert_project_details->bindParam(5, $project_carousel_imgs);
     $statement_insert_project_details->bindParam(6, $edited_details->projectPricePerPerson);
     $statement_insert_project_details->bindParam(7, $edited_details->projectMinNumOfPeople);
-    $statement_insert_project_details->bindParam(8, $edited_details->projectSummary);
-    $statement_insert_project_details->bindParam(9, $edited_details->projectDescription);
-    $statement_insert_project_details->bindParam(10, $visible);
-    $statement_insert_project_details->bindParam(11, $edited_details->projectCategory);
-    $statement_insert_project_details->bindParam(12, $edited_details->projectDepartureLocation);
+    $statement_insert_project_details->bindParam(8, $edited_details->projectMaxNumOfPeople);
+    $statement_insert_project_details->bindParam(9, $edited_details->projectSummary);
+    $statement_insert_project_details->bindParam(10, $edited_details->projectDescription);
+    $statement_insert_project_details->bindParam(11, $visible);
+    $statement_insert_project_details->bindParam(12, $edited_details->projectCategory);
+    $statement_insert_project_details->bindParam(13, $edited_details->projectDepartureLocation);
     $statement_insert_project_details->execute();
 
     echo '方案 ' . $project_id . ' 新增完成了！';

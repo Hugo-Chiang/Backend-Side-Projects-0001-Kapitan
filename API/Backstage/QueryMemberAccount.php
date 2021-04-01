@@ -10,7 +10,7 @@ include("../../Lib/PDO.php");
 // 接收前端 JSON 字串資料並解析
 $member_account = file_get_contents("php://input");
 
-// 執行：
+// 執行：根據關鍵詞查詢相關會員
 $sql_query_member_account = 'SELECT * FROM members WHERE MEMBER_ACCOUNT LIKE ? && MEMBER_VISIBLE_ON_WEB != 0';
 
 $statement_query_member_account = $pdo->prepare($sql_query_member_account);

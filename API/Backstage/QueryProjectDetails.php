@@ -10,7 +10,7 @@ include("../../Lib/PDO.php");
 // 接收前端 JSON 字串資料並解析
 $project_id = file_get_contents("php://input");
 
-// 執行：
+// 執行：根據關鍵詞查詢相關方案細節
 $sql_query_project_details = "SELECT * FROM
 (SELECT * FROM
  (SELECT * FROM projects as pj 

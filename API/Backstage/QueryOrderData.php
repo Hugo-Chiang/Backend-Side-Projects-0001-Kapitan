@@ -10,7 +10,7 @@ include("../../Lib/PDO.php");
 // 接收前端 JSON 字串資料並解析
 $order_id = file_get_contents("php://input");
 
-// 執行：
+// 執行：根據關鍵詞查詢相關訂單
 $sql_query_order_data = 'SELECT * FROM orders WHERE ORDER_ID = ? && ORDER_VISIBLE_ON_WEB != 0';
 
 $statement_query_order_data = $pdo->prepare($sql_query_order_data);

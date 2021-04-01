@@ -13,6 +13,7 @@ include("../../Lib/Functions.php");
 $json_string = file_get_contents("php://input");
 $json_data = json_decode($json_string);
 
+// 拼接：根據是否有查詢姓名或電話，拼接不同的 SQL 查詢語法，以增進搜尋正確度
 $sql_query_members_name_input_part = '';
 $sql_query_members_phone_input_part = '';
 
@@ -30,12 +31,11 @@ foreach ($json_data as $properity => $value) {
     $json_data->$properity = '%' . $value . '%';
 }
 
+// 執行：根據關鍵詞查詢相關會員
 $sql_query_members_main_part = 'SELECT * FROM members WHERE MEMBER_ID LIKE ? && MEMBER_STATUS LIKE ? && MEMBER_ACCOUNT LIKE ?';
 $sql_query_members_name_uninput_part = ' && (MEMBER_NAME LIKE ? || MEMBER_NAME IS NULL)';
 $sql_query_members_phone_uninput_part = ' && (MEMBER_PHONE LIKE ? || MEMBER_PHONE IS NULL)';
 $sql_query_members_rest_part = ' && MEMBER_VISIBLE_ON_WEB != 0';
-
-// 執行：
 
 if ($sql_query_members_name_input_part != '' && $sql_query_members_phone_input_part == '') {
 

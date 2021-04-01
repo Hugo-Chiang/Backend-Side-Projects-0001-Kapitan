@@ -25,6 +25,7 @@ if ($admin_level > 2) {
     echo '您的權限不足以執行這項操作！';
 } else {
 
+    // 判斷：若會員打算重設密碼，則進行新的加密活動
     if ($edited_details->reSetPassword == '') {
 
         $sql_query_password = "SELECT MEMBER_PASSWORD FROM members WHERE MEMBER_ID = ? && MEMBER_VISIBLE_ON_WEB != 0";
@@ -40,6 +41,7 @@ if ($admin_level > 2) {
         $member_password = hash('sha256', $edited_details->memberPassword);
     }
 
+    // 執行：根據輸入資料更新會員資訊
     $sql_update_member_info = "UPDATE members SET 
     MEMBER_REGISTERED_DATE = ?, MEMBER_STATUS = ?, MEMBER_ACCOUNT = ?, MEMBER_PASSWORD = ?, 
     MEMBER_NAME = ?, MEMBER_PHONE = ?, MEMBER_AVATAR_URL = ?, 
