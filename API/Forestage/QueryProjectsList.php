@@ -32,7 +32,7 @@ if (count($selected_categories) == 0) {
 
     // 執行：
     $sql_query_projects_list = "SELECT 
-    PROJECT_ID, PROJECT_NAME, PROJECT_AVATAR_URL, PROJECT_SUMMARY, PROJECT_ORIGINAL_PRICE_PER_PERSON, PROJECT_MIN_NUM_OF_PEOPLE, 
+    PROJECT_ID, PROJECT_NAME, PROJECT_AVATAR_URL, PROJECT_SUMMARY, PROJECT_ORIGINAL_PRICE_PER_PERSON, PROJECT_MIN_NUM_OF_PEOPLE, PROJECT_MAX_NUM_OF_PEOPLE, 
     FK_CATEGORY_ID_for_PJ FROM projects WHERE FK_CATEGORY_ID_for_PJ IN " . $category_id_str . " && PROJECT_ORIGINAL_PRICE_PER_PERSON <= ? 
     && PROJECT_STATUS > 0 && PROJECT_VISIBLE_ON_WEB != 0 ORDER BY " . $sort;
     $statement_query_projects_list = $pdo->prepare($sql_query_projects_list);

@@ -16,12 +16,32 @@ $json_data = json_decode($json_string);
 $session = $json_data->session;
 $project_id = $json_data->projectID;
 
-// 透過 session 判斷管理員權限是否足夠進行項目編輯
+// 執行：詢問方案是否屬於測試項目，以利後續區別相關權限操作
+$sql_query_testing_project = "SELECT PROJECT_FOR_TESTING FROM projects WHERE PROJECT_ID = ?";
+
+$statement_query_testing_project = $pdo->prepare($sql_query_testing_project);
+$statement_query_testing_project->bindParam(1, $project_id);
+$statement_query_testing_project->execute();
+
+$result_query = $statement_query_testing_project->fetch(PDO::FETCH_ASSOC);
+
+$testing = $result_query['PROJECT_FOR_TESTING'];
+
+// 透過 session 判斷管理員權限是否足夠進行項目刪除
 $admin_level = check_admin_permissions($pdo, $session);
 
 if ($admin_level > 2) {
 
-    echo '您的權限不足以執行這項操作！';
+    if ($testing == 1) {
+        $sql_delete_project = "UPDATE projects SET PROJECT_VISIBLE_ON_WEB = 0 WHERE PROJECT_ID = ?";
+        $statement_delete_project = $pdo->prepare($sql_delete_project);
+        $statement_delete_project->bindParam(1, $project_id);
+        $statement_delete_project->execute();
+
+        echo '方案 ' . $project_id . ' 已被刪除了。';
+    } else {
+        echo '您的權限不足以執行這項操作！';
+    }
 } else {
 
     $sql_delete_project = "UPDATE projects SET PROJECT_VISIBLE_ON_WEB = 0 WHERE PROJECT_ID = ?";
