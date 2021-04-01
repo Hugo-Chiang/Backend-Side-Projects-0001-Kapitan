@@ -17,7 +17,7 @@ foreach ($json_data as $properity => $value) {
     $json_data->$properity = '%' . $value . '%';
 }
 
-// 執行：
+// 執行：根據關鍵詞查詢相關訂單
 $sql_query_orders = 'SELECT * FROM
 (SELECT * FROM
 (SELECT * FROM
@@ -32,7 +32,7 @@ JOIN members as mb
 ON t3.FK_MEMBER_ID_for_OD = mb.MEMBER_ID
 WHERE
 ORDER_ID like ? && ORDER_DATE like ? && MEMBER_ACCOUNT like ? && 
-ORDER_MC_NAME like ? && ORDER_MC_PHONE like ? && ORDER_MC_EMAIL like ? && ORDER_VISIBLE_ON_WEB != 0';
+ORDER_MC_NAME like ? && ORDER_MC_PHONE like ? && ORDER_STATUS like ? && ORDER_VISIBLE_ON_WEB != 0';
 
 $statement_query_orders = $pdo->prepare($sql_query_orders);
 $statement_query_orders->bindParam(1, $json_data->orderID);
@@ -40,7 +40,7 @@ $statement_query_orders->bindParam(2, $json_data->orderDate);
 $statement_query_orders->bindParam(3, $json_data->memberAccount);
 $statement_query_orders->bindParam(4, $json_data->ordererName);
 $statement_query_orders->bindParam(5, $json_data->ordererPhone);
-$statement_query_orders->bindParam(6, $json_data->ordererEmail);
+$statement_query_orders->bindParam(6, $json_data->orderStatus);
 $statement_query_orders->execute();
 
 $query_result = $statement_query_orders->fetchAll(PDO::FETCH_ASSOC);
