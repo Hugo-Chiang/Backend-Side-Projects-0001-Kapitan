@@ -24,7 +24,6 @@ if ($query_result == null) {
         'sessionCheck' => false,
         'message' => '無效的登入對話！',
         'hihi' => $session_string,
-        'yaya' => $query_result
     ];
 
     print json_encode($return_obj);
