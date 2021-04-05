@@ -37,7 +37,7 @@ $statement_update_signin_authn->bindParam(1, $query_result['ADMIN_ID']);
 $statement_update_signin_authn->execute();
 
 // 執行：將 session 檢查成功的訊息回傳前端（准許前進），並親切地打聲招呼
-$sql_query_admin_signedin_data = "SELECT ADMIN_NAME FROM admin WHERE ADMIN_SESSION = ?";
+$sql_query_admin_signedin_data = "SELECT ADMIN_NAME, ADMIN_LEVEL  FROM admin WHERE ADMIN_SESSION = ?";
 $statement_query_admin_signedin_data = $pdo->prepare($sql_query_admin_signedin_data);
 $statement_query_admin_signedin_data->bindParam(1, $session_string);
 $statement_query_admin_signedin_data->execute();
@@ -46,6 +46,7 @@ $query_result = $statement_query_admin_signedin_data->fetch(PDO::FETCH_ASSOC);
 
 $return_obj = (object)[
     'sessionCheck' => true,
+    'adminLevel' => $query_result['ADMIN_LEVEL'],
     'message' => '歡迎回來，' . $query_result['ADMIN_NAME'],
 ];
 

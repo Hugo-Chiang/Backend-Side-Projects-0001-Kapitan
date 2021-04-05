@@ -34,50 +34,33 @@ $admin_level = check_admin_permissions($pdo, $session);
 if ($admin_level > 2) {
 
     if ($testing == 1) {
-        // 執行：根據輸入資料更新訂單資料
-        $sql_update_order_data = "UPDATE orders SET 
-        ORDER_DATE = ?, ORDER_TOTAL_CONSUMPTION = ?, ORDER_TOTAL_DISCOUNT = ?, ORDER_MC_NAME = ?, 
-        ORDER_MC_PHONE = ?, ORDER_MC_EMAIL = ?, ORDER_EC_NAME = ?, ORDER_EC_PHONE = ?, ORDER_EC_EMAIL = ?, FK_MEMBER_ID_for_OD = ? 
-        WHERE ORDER_ID = ? && ORDER_VISIBLE_ON_WEB != 0";
-        $statement_update_order_data = $pdo->prepare($sql_update_order_data);
-        $statement_update_order_data->bindParam(1, $edited_details->orderDate);
-        $statement_update_order_data->bindParam(2, $edited_details->orderTotalConsumption);
-        $statement_update_order_data->bindParam(3, $edited_details->orderTotalDiscount);
-        $statement_update_order_data->bindParam(4, $edited_details->MCname);
-        $statement_update_order_data->bindParam(5, $edited_details->MCphone);
-        $statement_update_order_data->bindParam(6, $edited_details->MCemail);
-        $statement_update_order_data->bindParam(7, $edited_details->ECname);
-        $statement_update_order_data->bindParam(8, $edited_details->ECphone);
-        $statement_update_order_data->bindParam(9, $edited_details->ECemail);
-        $statement_update_order_data->bindParam(10, $edited_details->memberID);
-        $statement_update_order_data->bindParam(11, $order_id);
-        $statement_update_order_data->execute();
-
-        echo '訂單 ' . $order_id . ' 修改完成了！';
+        $order_status = -1;
     } else {
         echo '您的權限不足以執行這項操作！';
+        exit;
     }
 } else {
-
-    // 執行：根據輸入資料更新訂單資料
-    $sql_update_order_data = "UPDATE orders SET 
-    ORDER_STATUS = ?, ORDER_DATE = ?, ORDER_TOTAL_CONSUMPTION = ?, ORDER_TOTAL_DISCOUNT = ?, ORDER_MC_NAME = ?, 
-    ORDER_MC_PHONE = ?, ORDER_MC_EMAIL = ?, ORDER_EC_NAME = ?, ORDER_EC_PHONE = ?, ORDER_EC_EMAIL = ?, FK_MEMBER_ID_for_OD = ? 
-    WHERE ORDER_ID = ? && ORDER_VISIBLE_ON_WEB != 0";
-    $statement_update_order_data = $pdo->prepare($sql_update_order_data);
-    $statement_update_order_data->bindParam(1, $edited_details->orderStatus);
-    $statement_update_order_data->bindParam(2, $edited_details->orderDate);
-    $statement_update_order_data->bindParam(3, $edited_details->orderTotalConsumption);
-    $statement_update_order_data->bindParam(4, $edited_details->orderTotalDiscount);
-    $statement_update_order_data->bindParam(5, $edited_details->MCname);
-    $statement_update_order_data->bindParam(6, $edited_details->MCphone);
-    $statement_update_order_data->bindParam(7, $edited_details->MCemail);
-    $statement_update_order_data->bindParam(8, $edited_details->ECname);
-    $statement_update_order_data->bindParam(9, $edited_details->ECphone);
-    $statement_update_order_data->bindParam(10, $edited_details->ECemail);
-    $statement_update_order_data->bindParam(11, $edited_details->memberID);
-    $statement_update_order_data->bindParam(12, $order_id);
-    $statement_update_order_data->execute();
-
-    echo '訂單 ' . $order_id . ' 修改完成了！';
+    $order_status = $edited_details->orderStatus;
 }
+
+// 執行：根據輸入資料更新訂單資料
+$sql_update_order_data = "UPDATE orders SET 
+ORDER_STATUS = ?, ORDER_DATE = ?, ORDER_TOTAL_CONSUMPTION = ?, ORDER_TOTAL_DISCOUNT = ?, ORDER_MC_NAME = ?, 
+ORDER_MC_PHONE = ?, ORDER_MC_EMAIL = ?, ORDER_EC_NAME = ?, ORDER_EC_PHONE = ?, ORDER_EC_EMAIL = ?, FK_MEMBER_ID_for_OD = ? 
+WHERE ORDER_ID = ? && ORDER_VISIBLE_ON_WEB != 0";
+$statement_update_order_data = $pdo->prepare($sql_update_order_data);
+$statement_update_order_data->bindParam(1, $order_status);
+$statement_update_order_data->bindParam(2, $edited_details->orderDate);
+$statement_update_order_data->bindParam(3, $edited_details->orderTotalConsumption);
+$statement_update_order_data->bindParam(4, $edited_details->orderTotalDiscount);
+$statement_update_order_data->bindParam(5, $edited_details->MCname);
+$statement_update_order_data->bindParam(6, $edited_details->MCphone);
+$statement_update_order_data->bindParam(7, $edited_details->MCemail);
+$statement_update_order_data->bindParam(8, $edited_details->ECname);
+$statement_update_order_data->bindParam(9, $edited_details->ECphone);
+$statement_update_order_data->bindParam(10, $edited_details->ECemail);
+$statement_update_order_data->bindParam(11, $edited_details->memberID);
+$statement_update_order_data->bindParam(12, $order_id);
+$statement_update_order_data->execute();
+
+echo '訂單 ' . $order_id . ' 修改完成了！';

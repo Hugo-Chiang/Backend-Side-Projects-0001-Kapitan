@@ -46,8 +46,9 @@ if ($query_result != null) {
     $sql_insert_order_data = "INSERT INTO orders 
     (ORDER_ID, ORDER_STATUS, ORDER_DATE, ORDER_TOTAL_CONSUMPTION, ORDER_TOTAL_DISCOUNT, 
     ORDER_MC_NAME, ORDER_MC_PHONE, ORDER_MC_EMAIL, 
-    ORDER_EC_NAME, ORDER_EC_PHONE, ORDER_EC_EMAIL, ORDER_VISIBLE_ON_WEB, FK_MEMBER_ID_for_OD) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    ORDER_EC_NAME, ORDER_EC_PHONE, ORDER_EC_EMAIL,
+    ORDER_FOR_TESTING, ORDER_VISIBLE_ON_WEB, FK_MEMBER_ID_for_OD) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $statement_insert_order_data = $pdo->prepare($sql_insert_order_data);
     $statement_insert_order_data->bindParam(1, $order_id);
     $statement_insert_order_data->bindParam(2, $order_status);
@@ -60,8 +61,9 @@ if ($query_result != null) {
     $statement_insert_order_data->bindParam(9, $edited_details->ECname);
     $statement_insert_order_data->bindParam(10, $edited_details->ECphone);
     $statement_insert_order_data->bindParam(11, $edited_details->ECemail);
-    $statement_insert_order_data->bindParam(12, $visible);
-    $statement_insert_order_data->bindParam(13, $edited_details->memberID);
+    $statement_insert_order_data->bindParam(12, $testing);
+    $statement_insert_order_data->bindParam(13, $visible);
+    $statement_insert_order_data->bindParam(14, $edited_details->memberID);
     $statement_insert_order_data->execute();
 
     echo '訂單 ' . $order_id . ' 新增完成了！';
