@@ -33,57 +33,50 @@ if ($edited_details->reSetPassword == '') {
     $member_password = hash('sha256', $edited_details->memberPassword);
 }
 
+// 執行：詢問會員是否屬於測試項目，以利後續區別相關權限操作
+$sql_query_testing_members = 'SELECT * FROM members WHERE MEMBER_ID = ?';
+
+$statement_query_testing_members = $pdo->prepare($sql_query_testing_members);
+$statement_query_testing_members->bindParam(1, $member_id);
+$statement_query_testing_members->execute();
+
+$query_result = $statement_query_testing_members->fetch(PDO::FETCH_ASSOC);
+
+$testing = $query_result['MEMBER_FOR_TESTING'];
+
 // 透過 session 判斷管理員權限是否足夠進行項目編輯
 $admin_level = check_admin_permissions($pdo, $session);
 
 if ($admin_level > 2) {
 
     if ($testing == 1) {
-
-        // 執行：根據輸入資料更新會員資訊
-        $sql_update_member_info = "UPDATE members SET 
-        MEMBER_REGISTERED_DATE = ?, MEMBER_ACCOUNT = ?, MEMBER_PASSWORD = ?, 
-        MEMBER_NAME = ?, MEMBER_PHONE = ?, MEMBER_AVATAR_URL = ?, 
-        MEMBER_EC_NAME = ?, MEMBER_EC_PHONE = ?, MEMBER_EC_EMAIL = ? 
-        WHERE MEMBER_ID = ? && MEMBER_VISIBLE_ON_WEB != 0";
-        $statement_update_member_info = $pdo->prepare($sql_update_member_info);
-        $statement_update_member_info->bindParam(1, $edited_details->memberRegDate);
-        $statement_update_member_info->bindParam(2, $edited_details->memberAccount);
-        $statement_update_member_info->bindParam(3, $member_password);
-        $statement_update_member_info->bindParam(4, $edited_details->MCname);
-        $statement_update_member_info->bindParam(5, $edited_details->MCphone);
-        $statement_update_member_info->bindParam(6, $edited_details->memberAvatarURL);
-        $statement_update_member_info->bindParam(7, $edited_details->ECname);
-        $statement_update_member_info->bindParam(8, $edited_details->ECphone);
-        $statement_update_member_info->bindParam(9, $edited_details->ECemail);
-        $statement_update_member_info->bindParam(10, $member_id);
-        $statement_update_member_info->execute();
-
-        echo '會員 ' . $member_id . ' 的資料修改完成了！';
+        $member_status = -1;
     } else {
         echo '您的權限不足以執行這項操作！';
+        exit;
     }
 } else {
-
-    // 執行：根據輸入資料更新會員資訊
-    $sql_update_member_info = "UPDATE members SET 
-    MEMBER_REGISTERED_DATE = ?, MEMBER_STATUS = ?, MEMBER_ACCOUNT = ?, MEMBER_PASSWORD = ?, 
-    MEMBER_NAME = ?, MEMBER_PHONE = ?, MEMBER_AVATAR_URL = ?, 
-    MEMBER_EC_NAME = ?, MEMBER_EC_PHONE = ?, MEMBER_EC_EMAIL = ? 
-    WHERE MEMBER_ID = ? && MEMBER_VISIBLE_ON_WEB != 0";
-    $statement_update_member_info = $pdo->prepare($sql_update_member_info);
-    $statement_update_member_info->bindParam(1, $edited_details->memberRegDate);
-    $statement_update_member_info->bindParam(2, $edited_details->memberStatus);
-    $statement_update_member_info->bindParam(3, $edited_details->memberAccount);
-    $statement_update_member_info->bindParam(4, $member_password);
-    $statement_update_member_info->bindParam(5, $edited_details->MCname);
-    $statement_update_member_info->bindParam(6, $edited_details->MCphone);
-    $statement_update_member_info->bindParam(7, $edited_details->memberAvatarURL);
-    $statement_update_member_info->bindParam(8, $edited_details->ECname);
-    $statement_update_member_info->bindParam(9, $edited_details->ECphone);
-    $statement_update_member_info->bindParam(10, $edited_details->ECemail);
-    $statement_update_member_info->bindParam(11, $member_id);
-    $statement_update_member_info->execute();
-
-    echo '會員 ' . $member_id . ' 的資料修改完成了！';
+    $member_status = $edited_details->memberStatus;
 }
+
+// 執行：根據輸入資料更新會員資訊
+$sql_update_member_info = "UPDATE members SET 
+MEMBER_REGISTERED_DATE = ?, MEMBER_STATUS = ?, MEMBER_ACCOUNT = ?, MEMBER_PASSWORD = ?, 
+MEMBER_NAME = ?, MEMBER_PHONE = ?, MEMBER_AVATAR_URL = ?, 
+MEMBER_EC_NAME = ?, MEMBER_EC_PHONE = ?, MEMBER_EC_EMAIL = ? 
+WHERE MEMBER_ID = ? && MEMBER_VISIBLE_ON_WEB != 0";
+$statement_update_member_info = $pdo->prepare($sql_update_member_info);
+$statement_update_member_info->bindParam(1, $edited_details->memberRegDate);
+$statement_update_member_info->bindParam(2, $member_status);
+$statement_update_member_info->bindParam(3, $edited_details->memberAccount);
+$statement_update_member_info->bindParam(4, $member_password);
+$statement_update_member_info->bindParam(5, $edited_details->MCname);
+$statement_update_member_info->bindParam(6, $edited_details->MCphone);
+$statement_update_member_info->bindParam(7, $edited_details->memberAvatarURL);
+$statement_update_member_info->bindParam(8, $edited_details->ECname);
+$statement_update_member_info->bindParam(9, $edited_details->ECphone);
+$statement_update_member_info->bindParam(10, $edited_details->ECemail);
+$statement_update_member_info->bindParam(11, $member_id);
+$statement_update_member_info->execute();
+
+echo '會員 ' . $member_id . ' 的資料修改完成了！';

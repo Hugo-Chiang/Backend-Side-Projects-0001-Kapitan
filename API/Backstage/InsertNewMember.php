@@ -42,11 +42,22 @@ if ($query_result != null && $query_result['MEMBER_ACCOUNT'] == $member_account)
 $admin_level = check_admin_permissions($pdo, $session);
 
 if ($admin_level > 2) {
-
     $testing = 1;
     $member_status = -1;
     $MCname = $edited_details->MCname;
-    $MCname = '（測試項目）' . $MCname;
+
+    if ($MCname == '') {
+        $MCname = '測試名稱';
+    }
+
+    $prefix_index = strpos($MCname, '（測試項目）');
+    $str_len = strlen('（測試項目）');
+
+    if ($prefix_index === 0) {
+        $MCname  = substr($MCname, $prefix_index + $str_lens);
+    }
+
+    $MCname  = '（測試項目）' . $MCname;
 } else {
 
     $testing = 0;

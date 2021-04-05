@@ -71,18 +71,6 @@ if ($query_result == null) {
     foreach ($query_result as $index => $sub_arr) {
         $sort_index = find_out_serial('members', $sub_arr['MEMBER_ID']);
         $query_result[$index]['SORT_INDEX'] = $sort_index;
-
-        switch ($query_result[$index]['MEMBER_STATUS']) {
-            case "0":
-                $query_result[$index]['MEMBER_STATUS'] = '停權';
-                break;
-            case "1":
-                $query_result[$index]['MEMBER_STATUS'] = '正常';
-                break;
-            case "2":
-                $query_result[$index]['MEMBER_STATUS'] = '警告';
-                break;
-        }
     }
 }
 
