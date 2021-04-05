@@ -23,11 +23,11 @@ $statement_query_testing_project = $pdo->prepare($sql_query_testing_project);
 $statement_query_testing_project->bindParam(1, $project_id);
 $statement_query_testing_project->execute();
 
-$result_query = $statement_query_testing_project->fetch(PDO::FETCH_ASSOC);
+$query_result = $statement_query_testing_project->fetch(PDO::FETCH_ASSOC);
 
-$testing = $result_query['PROJECT_FOR_TESTING'];
+$testing = $query_result['PROJECT_FOR_TESTING'];
 
-// 透過 session 判斷管理員權限是否足夠進行項目刪除
+// 透過 session 判斷管理員權限是否足夠進行方案刪除
 $admin_level = check_admin_permissions($pdo, $session);
 
 if ($admin_level > 2) {

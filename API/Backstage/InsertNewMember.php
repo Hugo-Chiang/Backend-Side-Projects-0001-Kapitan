@@ -44,11 +44,13 @@ $admin_level = check_admin_permissions($pdo, $session);
 if ($admin_level > 2) {
 
     $testing = 1;
+    $member_status = -1;
     $MCname = $edited_details->MCname;
     $MCname = '（測試項目）' . $MCname;
 } else {
 
     $testing = 0;
+    $member_status = $edited_details->memberStatus;
     $MCname = $edited_details->MCname;
 }
 
@@ -63,7 +65,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?)";
 $statement_insert_member_info = $pdo->prepare($sql_insert_member_info);
 $statement_insert_member_info->bindParam(1, $member_id);
 $statement_insert_member_info->bindParam(2, $edited_details->memberRegDate);
-$statement_insert_member_info->bindParam(3, $edited_details->memberStatus);
+$statement_insert_member_info->bindParam(3, $member_status);
 $statement_insert_member_info->bindParam(4, $member_account);
 $statement_insert_member_info->bindParam(5, $member_password);
 $statement_insert_member_info->bindParam(6, $MCname);

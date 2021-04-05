@@ -21,11 +21,13 @@ $admin_level = check_admin_permissions($pdo, $session);
 
 if ($admin_level > 2) {
     $testing = 1;
-    $projectName = $edited_details->projectName;
-    $projectName = '（測試項目）' . $projectName;
+    $project_status = -1;
+    $project_name = $edited_details->projectName;
+    $project_name = '（測試項目）' . $projectName;
 } else {
     $testing = 0;
-    $projectName = $edited_details->projectName;
+    $project_status = $edited_details->projectStatus;
+    $project_name = $edited_details->projectName;
 }
 
 // 執行：根據輸入資料建立新方案
@@ -40,8 +42,8 @@ FK_CATEGORY_ID_for_PJ, FK_LOCATION_ID_for_PJ)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 $statement_insert_project_details = $pdo->prepare($sql_insert_project_details);
 $statement_insert_project_details->bindParam(1, $project_id);
-$statement_insert_project_details->bindParam(2, $edited_details->projectStatus);
-$statement_insert_project_details->bindParam(3, $projectName);
+$statement_insert_project_details->bindParam(2, $project_status);
+$statement_insert_project_details->bindParam(3, $project_name);
 $statement_insert_project_details->bindParam(4, $edited_details->projectAvatarPublicID);
 $statement_insert_project_details->bindParam(5, $project_carousel_imgs);
 $statement_insert_project_details->bindParam(6, $edited_details->projectPricePerPerson);

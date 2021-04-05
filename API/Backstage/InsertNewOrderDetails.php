@@ -16,8 +16,18 @@ $json_data = json_decode($json_string);
 $session = $json_data->session;
 $creatDetails = $json_data->creatDetails;
 
-// 透過 session 判斷管理員權限是否足夠進行項目編輯
+// 透過 session 判斷管理員權限所建細項是否僅供測試
 $admin_level = check_admin_permissions($pdo, $session);
+
+if ($admin_level > 2) {
+
+    $testing = 1;
+    $order_details_status = -1;
+} else {
+
+    $testing = 0;
+    $order_details_status = $creatDetails[0]->ORDER_DETAIL_STATUS;
+}
 
 if ($admin_level > 2) {
 
@@ -33,7 +43,7 @@ if ($admin_level > 2) {
 
     $query_project_result = $statement_query_project->fetch(PDO::FETCH_ASSOC);
 
-    // 執行：查詢訂單是否存在
+    // 執行：查詢訂單是否存在或其是否為測試單
     $order_id = $creatDetails[0]->FK_ORDER_ID_for_ODD;
     $sql_query_order = "SELECT * FROM orders WHERE ORDER_ID = ? && ORDER_VISIBLE_ON_WEB != 0";
     $statement_query_order = $pdo->prepare($sql_query_order);
@@ -41,6 +51,7 @@ if ($admin_level > 2) {
     $statement_query_order->execute();
 
     $query_order_result = $statement_query_order->fetch(PDO::FETCH_ASSOC);
+    $query_order_for_testing = $query_order_result['ORDER_FOR_TESTING'];
 
     $query_results = (array)[
         (object)[
@@ -52,13 +63,14 @@ if ($admin_level > 2) {
             'unit' => '訂單',
             'ID' => $order_id,
             'exisit' => $query_order_result,
+            'forTesting' => $query_order_for_testing
         ],
     ];
 
     $data_error = false;
 
     foreach ($query_results as $obj) {
-        if ($obj->exisit == null) {
+        if ($obj->exisit == null || $obj->forTesting == -1) {
             $data_error = true;
         }
     }
@@ -74,12 +86,12 @@ if ($admin_level > 2) {
         (ORDER_DETAIL_ID, ORDER_DETAIL_STATUS, ORDER_DETAIL_AMOUNT, 
         ORDER_DETAIL_MC_NAME, ORDER_DETAIL_MC_PHONE, ORDER_DETAIL_MC_EMAIL, 
         ORDER_DETAIL_EC_NAME, ORDER_DETAIL_EC_PHONE, ORDER_DETAIL_EC_EMAIL, 
-        ORDER_DETAIL_VISIBLE_ON_WEB, FK_ORDER_ID_for_ODD)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        ORDER_DETAIL_FOR_TESTING, ORDER_DETAIL_VISIBLE_ON_WEB, FK_ORDER_ID_for_ODD)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $statement_insert_order_details = $pdo->prepare($sql_insert_order_details);
         $statement_insert_order_details->bindParam(1, $order_detail_id);
-        $statement_insert_order_details->bindParam(2, $creatDetails[0]->ORDER_DETAIL_STATUS);
+        $statement_insert_order_details->bindParam(2, $order_details_status);
         $statement_insert_order_details->bindParam(3, $creatDetails[0]->ORDER_DETAIL_AMOUNT);
         $statement_insert_order_details->bindParam(4, $creatDetails[0]->ORDER_DETAIL_MC_NAME);
         $statement_insert_order_details->bindParam(5, $creatDetails[0]->ORDER_DETAIL_MC_PHONE);
@@ -87,8 +99,9 @@ if ($admin_level > 2) {
         $statement_insert_order_details->bindParam(7, $creatDetails[0]->ORDER_DETAIL_EC_NAME);
         $statement_insert_order_details->bindParam(8, $creatDetails[0]->ORDER_DETAIL_EC_PHONE);
         $statement_insert_order_details->bindParam(9, $creatDetails[0]->ORDER_DETAIL_EC_EMAIL);
-        $statement_insert_order_details->bindParam(10, $visible);
-        $statement_insert_order_details->bindParam(11, $creatDetails[0]->FK_ORDER_ID_for_ODD);
+        $statement_insert_order_details->bindParam(10, $testing);
+        $statement_insert_order_details->bindParam(11, $visible);
+        $statement_insert_order_details->bindParam(12, $creatDetails[0]->FK_ORDER_ID_for_ODD);
         $statement_insert_order_details->execute();
 
         $sql_insert_order_details = "INSERT INTO booking 
@@ -132,6 +145,8 @@ if ($admin_level > 2) {
         foreach ($query_results as $obj) {
             if ($obj->exisit == null) {
                 echo $obj->ID . ' ' . $obj->unit . '並不存在。請再檢查一次。<br>';
+            } else if ($obj->forTesting == -1) {
+                echo '您的權限不足以將細項歸屬在非測試訂單上。請再檢查一次。';
             }
         }
     }
