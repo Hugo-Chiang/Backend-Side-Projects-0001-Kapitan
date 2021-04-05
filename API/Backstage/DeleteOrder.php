@@ -30,24 +30,15 @@ $testing = $query_result['ORDER_FOR_TESTING'];
 // 透過 session 判斷管理員權限是否足夠進行訂單刪除
 $admin_level = check_admin_permissions($pdo, $session);
 
-if ($admin_level > 2) {
+if ($admin_level > 2 && $testing != 1) {
 
-    if ($testing == 1) {
-        $sql_delete_order = "UPDATE orders SET ORDER_VISIBLE_ON_WEB = 0 WHERE ORDER_ID = ?";
-        $statement_delete_order = $pdo->prepare($sql_delete_order);
-        $statement_delete_order->bindParam(1, $order_id);
-        $statement_delete_order->execute();
-
-        echo '訂單 ' . $order_id . ' 已被刪除了。';
-    } else {
-        echo '您的權限不足以執行這項操作！';
-    }
-} else {
-
-    $sql_delete_order = "UPDATE orders SET ORDER_VISIBLE_ON_WEB = 0 WHERE ORDER_ID = ?";
-    $statement_delete_order = $pdo->prepare($sql_delete_order);
-    $statement_delete_order->bindParam(1, $order_id);
-    $statement_delete_order->execute();
-
-    echo '訂單 ' . $order_id . ' 已被刪除了。';
+    echo '您的權限不足以執行這項操作！';
+    exit;
 }
+
+$sql_delete_order = "UPDATE orders SET ORDER_VISIBLE_ON_WEB = 0 WHERE ORDER_ID = ?";
+$statement_delete_order = $pdo->prepare($sql_delete_order);
+$statement_delete_order->bindParam(1, $order_id);
+$statement_delete_order->execute();
+
+echo '訂單 ' . $order_id . ' 已被刪除了。';

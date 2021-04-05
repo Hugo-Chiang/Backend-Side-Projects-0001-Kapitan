@@ -22,8 +22,16 @@ $admin_level = check_admin_permissions($pdo, $session);
 if ($admin_level > 2) {
     $testing = 1;
     $project_status = -1;
+
     $project_name = $edited_details->projectName;
-    $project_name = '（測試項目）' . $projectName;
+    $prefix_index = strpos($project_name, '（測試項目）');
+    $str_len = strlen('（測試項目）');
+
+    if ($prefix_index === 0) {
+        $project_name = substr($project_name, $prefix_index + $str_lens);
+    }
+
+    $project_name = '（測試項目）' . $project_name;
 } else {
     $testing = 0;
     $project_status = $edited_details->projectStatus;

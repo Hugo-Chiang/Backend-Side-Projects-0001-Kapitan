@@ -30,24 +30,15 @@ $testing = $query_result['MEMBER_FOR_TESTING'];
 // 透過 session 判斷管理員權限是否足夠進行會員刪除
 $admin_level = check_admin_permissions($pdo, $session);
 
-if ($admin_level > 2) {
+if ($admin_level > 2 && $testing != 1) {
 
-    if ($testing == 1) {
-        $sql_delete_member = "UPDATE members SET MEMBER_VISIBLE_ON_WEB = 0 WHERE MEMBER_ID = ?";
-        $statement_delete_member = $pdo->prepare($sql_delete_member);
-        $statement_delete_member->bindParam(1, $member_id);
-        $statement_delete_member->execute();
-
-        echo '會員 ' . $member_id . ' 已被刪除了。';
-    } else {
-        echo '您的權限不足以執行這項操作！';
-    }
-} else {
-
-    $sql_delete_member = "UPDATE members SET MEMBER_VISIBLE_ON_WEB = 0 WHERE MEMBER_ID = ?";
-    $statement_delete_member = $pdo->prepare($sql_delete_member);
-    $statement_delete_member->bindParam(1, $member_id);
-    $statement_delete_member->execute();
-
-    echo '會員 ' . $member_id . ' 已被刪除了。';
+    echo '您的權限不足以執行這項操作！';
+    exit;
 }
+
+$sql_delete_member = "UPDATE members SET MEMBER_VISIBLE_ON_WEB = 0 WHERE MEMBER_ID = ?";
+$statement_delete_member = $pdo->prepare($sql_delete_member);
+$statement_delete_member->bindParam(1, $member_id);
+$statement_delete_member->execute();
+
+echo '會員 ' . $member_id . ' 已被刪除了。';
