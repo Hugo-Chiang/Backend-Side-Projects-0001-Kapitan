@@ -39,14 +39,13 @@ for ($i = 0; $i < count($order_details_arr); $i++) {
     }
 }
 
-
 if (count($alerady_booking_arr) > 0) {
 
     // 向前端回傳結果：若干方案已有預約
     $return_obj = (object)[
         'status' => '重複訂購',
         'message' => '很抱歉，您所挑選的方案中，有【' . count($alerady_booking_arr) . '】筆在剛剛被預約了。系統已為您刪去重複預約的方案，再請確認新的結帳內容。謝謝您！',
-        'invalidAProjects' => $alerady_booking_arr,
+        'invalidProjects' => $alerady_booking_arr,
     ];
 
     print json_encode($return_obj);
@@ -73,12 +72,14 @@ if (count($alerady_booking_arr) > 0) {
     // 執行：判斷並寫入最新訂單編號
     $insert_order_id = insert_max_id($pdo, 'orders');
     $order_status = 1;
+    $testing = 0;
 
     $sql_insert_order = "INSERT INTO 
     orders(ORDER_ID, ORDER_STATUS, ORDER_DATE, ORDER_TOTAL_CONSUMPTION, ORDER_TOTAL_DISCOUNT, 
     ORDER_MC_NAME, ORDER_MC_PHONE, ORDER_MC_EMAIL, 
-    ORDER_EC_NAME, ORDER_EC_PHONE, ORDER_EC_EMAIL, ORDER_VISIBLE_ON_WEB, FK_MEMBER_ID_for_OD) 
-    VALUES (?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    ORDER_EC_NAME, ORDER_EC_PHONE, ORDER_EC_EMAIL, 
+    ORDER_FOR_TESTING, ORDER_VISIBLE_ON_WEB, FK_MEMBER_ID_for_OD) 
+    VALUES (?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     // 執行：訂單寫入 orders 表格
     $statement_insert_order = $pdo->prepare($sql_insert_order);
@@ -93,7 +94,8 @@ if (count($alerady_booking_arr) > 0) {
     $statement_insert_order->bindParam(9, $orderer_contact_info_arr->ECphone);
     $statement_insert_order->bindParam(10, $orderer_contact_info_arr->ECemail);
     $statement_insert_order->bindParam(11, $visible);
-    $statement_insert_order->bindParam(12, $member_id);
+    $statement_insert_order->bindParam(12, $testing);
+    $statement_insert_order->bindParam(13, $member_id);
     $statement_insert_order->execute();
 
     // 執行：訂單細項寫入 order_details 表格，同時預約紀錄寫入 booking 表格
@@ -114,8 +116,8 @@ if (count($alerady_booking_arr) > 0) {
 
         $sql_instert_order_detail = "INSERT INTO order_details 
         (ORDER_DETAIL_ID, ORDER_DETAIL_STATUS, ORDER_DETAIL_AMOUNT, ORDER_DETAIL_MC_NAME, ORDER_DETAIL_MC_PHONE, ORDER_DETAIL_MC_EMAIL, 
-        ORDER_DETAIL_EC_NAME, ORDER_DETAIL_EC_PHONE, ORDER_DETAIL_EC_EMAIL, ORDER_DETAIL_VISIBLE_ON_WEB, FK_ORDER_ID_for_ODD) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        ORDER_DETAIL_EC_NAME, ORDER_DETAIL_EC_PHONE, ORDER_DETAIL_EC_EMAIL, ORDER_DETAIL_FOR_TESTING, ORDER_DETAIL_VISIBLE_ON_WEB, FK_ORDER_ID_for_ODD) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $insert_order_detail_id = insert_max_id($pdo, 'order_details');
         $order_detail_status = 1;
@@ -130,8 +132,9 @@ if (count($alerady_booking_arr) > 0) {
         $statement_instert_order_detail->bindParam(7, $order_details_arr[$i]->ECname);
         $statement_instert_order_detail->bindParam(8, $order_details_arr[$i]->ECphone);
         $statement_instert_order_detail->bindParam(9, $order_details_arr[$i]->ECemail);
-        $statement_instert_order_detail->bindParam(10, $visible);
-        $statement_instert_order_detail->bindParam(11, $insert_order_id);
+        $statement_instert_order_detail->bindParam(10, $testing);
+        $statement_instert_order_detail->bindParam(11, $visible);
+        $statement_instert_order_detail->bindParam(12, $insert_order_id);
         $statement_instert_order_detail->execute();
 
         $sql_insert_booking = "INSERT INTO 
