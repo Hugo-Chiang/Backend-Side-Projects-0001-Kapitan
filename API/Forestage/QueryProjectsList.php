@@ -30,7 +30,7 @@ if (count($selected_categories) == 0) {
     $category_id_str = substr($category_id_str, 1, strlen($category_id_str) - 1);
     $category_id_str = "(" . $category_id_str  . ")";
 
-    // 執行：
+    // 執行：根據篩選條件找出相對應的方案
     $sql_query_projects_list = "SELECT 
     PROJECT_ID, PROJECT_NAME, PROJECT_AVATAR_URL, PROJECT_SUMMARY, PROJECT_ORIGINAL_PRICE_PER_PERSON, PROJECT_MIN_NUM_OF_PEOPLE, PROJECT_MAX_NUM_OF_PEOPLE, 
     FK_CATEGORY_ID_for_PJ FROM projects WHERE FK_CATEGORY_ID_for_PJ IN " . $category_id_str . " && PROJECT_ORIGINAL_PRICE_PER_PERSON <= ? 
@@ -41,11 +41,5 @@ if (count($selected_categories) == 0) {
 
     $result_query_projects_list = $statement_query_projects_list->fetchAll(PDO::FETCH_ASSOC);
 }
-
-// 向前端回傳內容
-// $return_obj = (object)[
-//     'projectContent' => $query_project_content_result,
-//     'projectBooking' => $query_query_project_booking_result,
-// ];
 
 print json_encode($result_query_projects_list);
