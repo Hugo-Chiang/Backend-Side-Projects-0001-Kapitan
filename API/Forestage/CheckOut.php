@@ -93,8 +93,8 @@ if (count($alerady_booking_arr) > 0) {
     $statement_insert_order->bindParam(8, $orderer_contact_info_arr->ECname);
     $statement_insert_order->bindParam(9, $orderer_contact_info_arr->ECphone);
     $statement_insert_order->bindParam(10, $orderer_contact_info_arr->ECemail);
-    $statement_insert_order->bindParam(11, $visible);
-    $statement_insert_order->bindParam(12, $testing);
+    $statement_insert_order->bindParam(11, $testing);
+    $statement_insert_order->bindParam(12, $visible);
     $statement_insert_order->bindParam(13, $member_id);
     $statement_insert_order->execute();
 
