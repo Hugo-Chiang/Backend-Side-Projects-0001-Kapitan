@@ -15,7 +15,9 @@ $json_data = json_decode($json_string);
 
 // 新建變數或接收關鍵資料，以利後續操作
 $member_id = $json_data->memberID;
+$member_account = $json_data->memberAccount;
 $orderer_contact_info_arr = $json_data->ordererContactInfo;
+$orderer_email = $orderer_contact_info_arr->MCemail;
 $order_details_arr = $json_data->orderDetails;
 $discount = 0;
 $visible = 1;
@@ -98,6 +100,17 @@ if (count($alerady_booking_arr) > 0) {
     $statement_insert_order->bindParam(13, $member_id);
     $statement_insert_order->execute();
 
+    // 執行：選出訂單細項所用的密鑰，以利後續產生購買憑證
+    $para = 'order_details';
+    $sql_query_secret_key = 'SELECT SECRET_KEY_VALUE FROM secret_keys WHERE SECRET_KEY_USAGE = ?';
+    $statement_query_secret_key = $pdo->prepare($sql_query_secret_key);
+    $statement_query_secret_key->bindParam(1, $para);
+    $statement_query_secret_key->execute();
+
+    $order_details_secret_key_row = $statement_query_secret_key->fetch(PDO::FETCH_ASSOC);
+    $order_details_secret_key = $order_details_secret_key_row['SECRET_KEY_VALUE'];
+    $order_detail_certificate_arr = [];
+
     // 執行：訂單細項寫入 order_details 表格，同時預約紀錄寫入 booking 表格
     for ($i = 0; $i < count($order_details_arr); $i++) {
 
@@ -115,12 +128,16 @@ if (count($alerady_booking_arr) > 0) {
         $order_details_amount = $project_price * $booking_num_of_people;
 
         $sql_instert_order_detail = "INSERT INTO order_details 
-        (ORDER_DETAIL_ID, ORDER_DETAIL_STATUS, ORDER_DETAIL_AMOUNT, ORDER_DETAIL_MC_NAME, ORDER_DETAIL_MC_PHONE, ORDER_DETAIL_MC_EMAIL, 
-        ORDER_DETAIL_EC_NAME, ORDER_DETAIL_EC_PHONE, ORDER_DETAIL_EC_EMAIL, ORDER_DETAIL_FOR_TESTING, ORDER_DETAIL_VISIBLE_ON_WEB, FK_ORDER_ID_for_ODD) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        (ORDER_DETAIL_ID, ORDER_DETAIL_STATUS, ORDER_DETAIL_AMOUNT, 
+        ORDER_DETAIL_MC_NAME, ORDER_DETAIL_MC_PHONE, ORDER_DETAIL_MC_EMAIL, 
+        ORDER_DETAIL_EC_NAME, ORDER_DETAIL_EC_PHONE, ORDER_DETAIL_EC_EMAIL, 
+        ORDER_DETAIL_FOR_TESTING, ORDER_DETAIL_VISIBLE_ON_WEB, ORDER_DETAIL_CERTIFICATE, 
+        FK_ORDER_ID_for_ODD) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $insert_order_detail_id = insert_max_id($pdo, 'order_details');
         $order_detail_status = 1;
+        $order_detail_certificate = md5($insert_order_detail_id . $member_account . $order_details_secret_key);
 
         $statement_instert_order_detail = $pdo->prepare($sql_instert_order_detail);
         $statement_instert_order_detail->bindParam(1, $insert_order_detail_id);
@@ -134,8 +151,14 @@ if (count($alerady_booking_arr) > 0) {
         $statement_instert_order_detail->bindParam(9, $order_details_arr[$i]->ECemail);
         $statement_instert_order_detail->bindParam(10, $testing);
         $statement_instert_order_detail->bindParam(11, $visible);
-        $statement_instert_order_detail->bindParam(12, $insert_order_id);
+        $statement_instert_order_detail->bindParam(12, $order_detail_certificate);
+        $statement_instert_order_detail->bindParam(13, $insert_order_id);
         $statement_instert_order_detail->execute();
+
+        array_push($order_detail_certificate_arr, (object)[
+            'orderDetailID' => $insert_order_detail_id,
+            'certificate' => $order_detail_certificate,
+        ]);
 
         $sql_insert_booking = "INSERT INTO 
         booking(BOOKING_ID, BOOKING_DATE, BOOKING_NUM_OF_PEOPLE, BOOKING_VISIBLE_ON_WEB, FK_PROJECT_ID_for_BK, FK_ORDER_DETAIL_ID_for_BK) 
@@ -157,7 +180,10 @@ if (count($alerady_booking_arr) > 0) {
     $return_obj = (object)[
         'status' => '訂購成功',
         'message' => '會員【' . $member_id . '】的訂單完成了！編號是：【' . $insert_order_id . '】。',
-        'order_id' => $insert_order_id,
+        'orderID' => $insert_order_id,
+        'noticeEmails' => 'statesman1991@gmail.com, majorrabbit2021@gmail.com',
+        // 'noticeEmails' => $member_account . ', ' . $orderer_email,
+        'certificateArr' => $order_detail_certificate_arr
     ];
 
     print json_encode($return_obj);

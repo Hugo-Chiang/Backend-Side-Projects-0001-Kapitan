@@ -92,14 +92,38 @@ if (!$data_error) {
         $order_detail_status = $edited_details->orderDetailStatus;
     }
 
+    // 執行：選出訂單細項所用的密鑰，以利後續產生購買憑證
+    $para = 'order_details';
+    $sql_query_secret_key = 'SELECT SECRET_KEY_VALUE FROM secret_keys WHERE SECRET_KEY_USAGE = ?';
+    $statement_query_secret_key = $pdo->prepare($sql_query_secret_key);
+    $statement_query_secret_key->bindParam(1, $para);
+    $statement_query_secret_key->execute();
+
+    $order_details_secret_key_row = $statement_query_secret_key->fetch(PDO::FETCH_ASSOC);
+    $order_details_secret_key = $order_details_secret_key_row['SECRET_KEY_VALUE'];
+
+    // 執行：查詢訂單持有者帳號，以利後續產生購買憑證
+    $sql_query_member_account = 'SELECT mb.MEMBER_ACCOUNT FROM orders as od
+    JOIN members as mb ON od.FK_MEMBER_ID_for_OD = mb.MEMBER_ID 
+    WHERE od.ORDER_ID = ? && od.ORDER_VISIBLE_ON_WEB != 0';
+
+    $statement_query_member_account = $pdo->prepare($sql_query_member_account);
+    $statement_query_member_account->bindParam(1, $order_id);
+    $statement_query_member_account->execute();
+
+    $query_result = $statement_query_member_account->fetch(PDO::FETCH_ASSOC);
+    $member_account = $query_result['MEMBER_ACCOUNT'];
+
+    $order_detail_certificate = md5($edited_details->orderDetailID . $member_account . $order_details_secret_key);
+
     // 執行：根據輸入資料更新訂單細項內容
     $sql_update_order_details = "UPDATE order_details as odd JOIN booking as bk 
     ON bk.FK_ORDER_DETAIL_ID_for_BK = odd.ORDER_DETAIL_ID SET 
     odd.ORDER_DETAIL_STATUS = ?, odd.ORDER_DETAIL_AMOUNT = ?, 
     odd.ORDER_DETAIL_MC_NAME = ?, odd.ORDER_DETAIL_MC_PHONE = ?, odd.ORDER_DETAIL_MC_EMAIL = ?, 
     odd.ORDER_DETAIL_EC_NAME = ?, odd.ORDER_DETAIL_EC_PHONE = ?, odd.ORDER_DETAIL_EC_EMAIL = ?, 
-    bk.FK_PROJECT_ID_for_BK = ?, bk.BOOKING_NUM_OF_PEOPLE = ?, bk.BOOKING_DATE = ?, FK_ORDER_ID_for_ODD = ? 
-    WHERE odd.ORDER_DETAIL_ID = ? && odd.ORDER_DETAIL_VISIBLE_ON_WEB != 0";
+    bk.FK_PROJECT_ID_for_BK = ?, bk.BOOKING_NUM_OF_PEOPLE = ?, bk.BOOKING_DATE = ?, ORDER_DETAIL_CERTIFICATE = ?, 
+    FK_ORDER_ID_for_ODD = ? WHERE odd.ORDER_DETAIL_ID = ? && odd.ORDER_DETAIL_VISIBLE_ON_WEB != 0";
     $statement_update_order_details = $pdo->prepare($sql_update_order_details);
     $statement_update_order_details->bindParam(1, $order_detail_status);
     $statement_update_order_details->bindParam(2, $edited_details->orderDetailAmount);
@@ -112,8 +136,9 @@ if (!$data_error) {
     $statement_update_order_details->bindParam(9, $edited_details->projectID);
     $statement_update_order_details->bindParam(10, $edited_details->bookingNumOfPeople);
     $statement_update_order_details->bindParam(11, $edited_details->bookingDate);
-    $statement_update_order_details->bindParam(12, $edited_details->newOrderID);
-    $statement_update_order_details->bindParam(13, $edited_details->orderDetailID);
+    $statement_update_order_details->bindParam(12, $order_detail_certificate);
+    $statement_update_order_details->bindParam(13, $edited_details->newOrderID);
+    $statement_update_order_details->bindParam(14, $edited_details->orderDetailID);
     $statement_update_order_details->execute();
 
     // 執行：因應細項修改而更新訂單總金額

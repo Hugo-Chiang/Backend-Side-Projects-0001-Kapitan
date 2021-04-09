@@ -11,7 +11,7 @@ include("../../Lib/PDO.php");
 $session_string = file_get_contents("php://input");
 
 // 執行：查詢現有登入 session 是否存在（有效），並找出持有人是誰
-$sql_query_member_session = 'SELECT MEMBER_ID FROM members WHERE MEMBER_SESSION = ?';
+$sql_query_member_session = 'SELECT MEMBER_ID, MEMBER_ACCOUNT FROM members WHERE MEMBER_SESSION = ?';
 $statement_query_member_session = $pdo->prepare($sql_query_member_session);
 $statement_query_member_session->bindParam(1, $session_string);
 $statement_query_member_session->execute();
@@ -38,6 +38,7 @@ $statement_update_signin_authn->execute();
 $return_obj = (object)[
     'sessionCheck' => true,
     'signInedID' => $query_result['MEMBER_ID'],
+    'signInedAccount' => $query_result['MEMBER_ACCOUNT'],
 ];
 
 print json_encode($return_obj);

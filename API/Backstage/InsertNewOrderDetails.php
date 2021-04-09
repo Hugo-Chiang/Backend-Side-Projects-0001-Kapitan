@@ -77,17 +77,30 @@ foreach ($query_results as $obj) {
 
 if (!$data_error) {
 
+    // 執行：選出訂單細項所用的密鑰，以利後續產生購買憑證
+    $para = 'order_details';
+    $sql_query_secret_key = 'SELECT SECRET_KEY_VALUE FROM secret_keys WHERE SECRET_KEY_USAGE = ?';
+    $statement_query_secret_key = $pdo->prepare($sql_query_secret_key);
+    $statement_query_secret_key->bindParam(1, $para);
+    $statement_query_secret_key->execute();
+
+    $order_details_secret_key_row = $statement_query_secret_key->fetch(PDO::FETCH_ASSOC);
+    $order_details_secret_key = $order_details_secret_key_row['SECRET_KEY_VALUE'];
+
     $order_detail_id = insert_max_id($pdo, 'order_details');
+    $member_account = $creatDetails[0]->ORDER_DETAIL_AMOUNT;
     $booking_id = insert_max_id($pdo, 'booking');
     $visible = 1;
+    $order_detail_certificate = md5($order_detail_id . $member_account . $order_details_secret_key);
 
     // 執行：新增訂單細項
     $sql_insert_order_details = "INSERT INTO order_details 
     (ORDER_DETAIL_ID, ORDER_DETAIL_STATUS, ORDER_DETAIL_AMOUNT, 
     ORDER_DETAIL_MC_NAME, ORDER_DETAIL_MC_PHONE, ORDER_DETAIL_MC_EMAIL, 
     ORDER_DETAIL_EC_NAME, ORDER_DETAIL_EC_PHONE, ORDER_DETAIL_EC_EMAIL, 
-    ORDER_DETAIL_FOR_TESTING, ORDER_DETAIL_VISIBLE_ON_WEB, FK_ORDER_ID_for_ODD)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    ORDER_DETAIL_FOR_TESTING, ORDER_DETAIL_VISIBLE_ON_WEB, ORDER_DETAIL_CERTIFICATE, 
+    FK_ORDER_ID_for_ODD)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $statement_insert_order_details = $pdo->prepare($sql_insert_order_details);
     $statement_insert_order_details->bindParam(1, $order_detail_id);
@@ -101,7 +114,8 @@ if (!$data_error) {
     $statement_insert_order_details->bindParam(9, $creatDetails[0]->ORDER_DETAIL_EC_EMAIL);
     $statement_insert_order_details->bindParam(10, $testing);
     $statement_insert_order_details->bindParam(11, $visible);
-    $statement_insert_order_details->bindParam(12, $creatDetails[0]->FK_ORDER_ID_for_ODD);
+    $statement_insert_order_details->bindParam(12, $order_detail_certificate);
+    $statement_insert_order_details->bindParam(13, $creatDetails[0]->FK_ORDER_ID_for_ODD);
     $statement_insert_order_details->execute();
 
     $sql_insert_order_details = "INSERT INTO booking 
