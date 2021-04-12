@@ -25,6 +25,10 @@ function insert_max_id($pdo, $table_name)
             $table_id_template = 'MB0000000';
             $table_title = 'MEMBER_ID';
             break;
+        case 'edm_list':
+            $table_id_template = 'EM0000000';
+            $table_title = 'EDM_ID';
+            break;
     }
 
     $template_split_arr = str_split($table_id_template);
