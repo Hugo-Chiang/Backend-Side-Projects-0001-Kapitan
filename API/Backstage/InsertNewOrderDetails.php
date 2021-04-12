@@ -14,7 +14,7 @@ $json_string = file_get_contents("php://input");
 $json_data = json_decode($json_string);
 
 $session = $json_data->session;
-$creatDetails = $json_data->creatDetails;
+$creatingDetails = $json_data->creatingDetails;
 
 // 透過 session 判斷管理員權限所建細項是否僅供測試
 $admin_level = check_admin_permissions($pdo, $session);
@@ -26,13 +26,13 @@ if ($admin_level > 2) {
 } else {
 
     $testing = 0;
-    $order_details_status = $creatDetails[0]->ORDER_DETAIL_STATUS;
+    $order_details_status = $creatingDetails[0]->ORDER_DETAIL_STATUS;
 }
 
 $data_error = [];
 
 // 執行：查詢方案是否存在
-$project_id = $creatDetails[0]->PROJECT_ID;
+$project_id = $creatingDetails[0]->PROJECT_ID;
 $sql_query_project = "SELECT * FROM projects WHERE PROJECT_ID = ? && PROJECT_VISIBLE_ON_WEB != 0";
 $statement_query_project = $pdo->prepare($sql_query_project);
 $statement_query_project->bindParam(1,  $project_id);
@@ -45,7 +45,7 @@ if ($query_project_result == null) {
 }
 
 // 執行：查詢訂單是否存在或其是否為測試單
-$order_id = $creatDetails[0]->FK_ORDER_ID_for_ODD;
+$order_id = $creatingDetails[0]->FK_ORDER_ID_for_ODD;
 $sql_query_order = "SELECT * FROM orders WHERE ORDER_ID = ? && ORDER_VISIBLE_ON_WEB != 0";
 $statement_query_order = $pdo->prepare($sql_query_order);
 $statement_query_order->bindParam(1, $order_id);
@@ -98,7 +98,7 @@ if (count($data_error) > 0) {
     $order_details_secret_key = $order_details_secret_key_row['SECRET_KEY_VALUE'];
 
     $order_detail_id = insert_max_id($pdo, 'order_details');
-    $member_account = $creatDetails[0]->ORDER_DETAIL_AMOUNT;
+    $member_account = $creatingDetails[0]->ORDER_DETAIL_AMOUNT;
     $booking_id = insert_max_id($pdo, 'booking');
     $visible = 1;
     $order_detail_certificate = md5($order_detail_id . $member_account . $order_details_secret_key);
@@ -115,17 +115,17 @@ if (count($data_error) > 0) {
     $statement_insert_order_details = $pdo->prepare($sql_insert_order_details);
     $statement_insert_order_details->bindParam(1, $order_detail_id);
     $statement_insert_order_details->bindParam(2, $order_details_status);
-    $statement_insert_order_details->bindParam(3, $creatDetails[0]->ORDER_DETAIL_AMOUNT);
-    $statement_insert_order_details->bindParam(4, $creatDetails[0]->ORDER_DETAIL_MC_NAME);
-    $statement_insert_order_details->bindParam(5, $creatDetails[0]->ORDER_DETAIL_MC_PHONE);
-    $statement_insert_order_details->bindParam(6, $creatDetails[0]->ORDER_DETAIL_MC_EMAIL);
-    $statement_insert_order_details->bindParam(7, $creatDetails[0]->ORDER_DETAIL_EC_NAME);
-    $statement_insert_order_details->bindParam(8, $creatDetails[0]->ORDER_DETAIL_EC_PHONE);
-    $statement_insert_order_details->bindParam(9, $creatDetails[0]->ORDER_DETAIL_EC_EMAIL);
+    $statement_insert_order_details->bindParam(3, $creatingDetails[0]->ORDER_DETAIL_AMOUNT);
+    $statement_insert_order_details->bindParam(4, $creatingDetails[0]->ORDER_DETAIL_MC_NAME);
+    $statement_insert_order_details->bindParam(5, $creatingDetails[0]->ORDER_DETAIL_MC_PHONE);
+    $statement_insert_order_details->bindParam(6, $creatingDetails[0]->ORDER_DETAIL_MC_EMAIL);
+    $statement_insert_order_details->bindParam(7, $creatingDetails[0]->ORDER_DETAIL_EC_NAME);
+    $statement_insert_order_details->bindParam(8, $creatingDetails[0]->ORDER_DETAIL_EC_PHONE);
+    $statement_insert_order_details->bindParam(9, $creatingDetails[0]->ORDER_DETAIL_EC_EMAIL);
     $statement_insert_order_details->bindParam(10, $testing);
     $statement_insert_order_details->bindParam(11, $visible);
     $statement_insert_order_details->bindParam(12, $order_detail_certificate);
-    $statement_insert_order_details->bindParam(13, $creatDetails[0]->FK_ORDER_ID_for_ODD);
+    $statement_insert_order_details->bindParam(13, $creatingDetails[0]->FK_ORDER_ID_for_ODD);
     $statement_insert_order_details->execute();
 
     $sql_insert_order_details = "INSERT INTO booking 
@@ -135,10 +135,10 @@ if (count($data_error) > 0) {
 
     $statement_insert_order_details = $pdo->prepare($sql_insert_order_details);
     $statement_insert_order_details->bindParam(1, $booking_id);
-    $statement_insert_order_details->bindParam(2, $creatDetails[0]->BOOKING_DATE);
-    $statement_insert_order_details->bindParam(3, $creatDetails[0]->BOOKING_NUM_OF_PEOPLE);
+    $statement_insert_order_details->bindParam(2, $creatingDetails[0]->BOOKING_DATE);
+    $statement_insert_order_details->bindParam(3, $creatingDetails[0]->BOOKING_NUM_OF_PEOPLE);
     $statement_insert_order_details->bindParam(4, $visible);
-    $statement_insert_order_details->bindParam(5, $creatDetails[0]->PROJECT_ID);
+    $statement_insert_order_details->bindParam(5, $creatingDetails[0]->PROJECT_ID);
     $statement_insert_order_details->bindParam(6, $order_detail_id);
     $statement_insert_order_details->execute();
 
@@ -150,7 +150,7 @@ if (count($data_error) > 0) {
     WHERE t1.ORDER_ID = ? && t1.ORDER_VISIBLE_ON_WEB != 0 && t1.ORDER_DETAIL_VISIBLE_ON_WEB != 0 
     GROUP BY t1.ORDER_ID";
     $statement_query_order_new_amount = $pdo->prepare($sql_query_order_new_amount);
-    $statement_query_order_new_amount->bindParam(1, $creatDetails[0]->FK_ORDER_ID_for_ODD);
+    $statement_query_order_new_amount->bindParam(1, $creatingDetails[0]->FK_ORDER_ID_for_ODD);
     $statement_query_order_new_amount->execute();
 
     $query_result = $statement_query_order_new_amount->fetch(PDO::FETCH_ASSOC);
@@ -160,7 +160,7 @@ if (count($data_error) > 0) {
     WHERE ORDER_ID = ? && ORDER_VISIBLE_ON_WEB != 0";
     $statement_update_order_amount = $pdo->prepare($sql_update_order_amount);
     $statement_update_order_amount->bindParam(1, $order_new_amount);
-    $statement_update_order_amount->bindParam(2, $creatDetails[0]->FK_ORDER_ID_for_ODD);
+    $statement_update_order_amount->bindParam(2, $creatingDetails[0]->FK_ORDER_ID_for_ODD);
     $statement_update_order_amount->execute();
 
     echo $order_detail_id . ' 細項新增完成了！';
