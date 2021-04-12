@@ -29,6 +29,8 @@ if ($admin_level > 2) {
     $order_details_status = $creatDetails[0]->ORDER_DETAIL_STATUS;
 }
 
+$data_error = [];
+
 // 執行：查詢方案是否存在
 $project_id = $creatDetails[0]->PROJECT_ID;
 $sql_query_project = "SELECT * FROM projects WHERE PROJECT_ID = ? && PROJECT_VISIBLE_ON_WEB != 0";
@@ -37,6 +39,10 @@ $statement_query_project->bindParam(1,  $project_id);
 $statement_query_project->execute();
 
 $query_project_result = $statement_query_project->fetch(PDO::FETCH_ASSOC);
+
+if ($query_project_result == null) {
+    array_push($data_error, '方案不存在');
+}
 
 // 執行：查詢訂單是否存在或其是否為測試單
 $order_id = $creatDetails[0]->FK_ORDER_ID_for_ODD;
@@ -52,30 +58,34 @@ if ($query_order_result) {
     $query_order_for_testing = $query_order_result['ORDER_FOR_TESTING'];
 }
 
-$query_results = (array)[
-    (object)[
-        'unit' => '方案',
-        'ID' => $project_id,
-        'exisit' => $query_project_result,
-        'forTesting' => '無關'
-    ],
-    (object)[
-        'unit' => '訂單',
-        'ID' => $order_id,
-        'exisit' => $query_order_result,
-        'forTesting' => $query_order_for_testing
-    ],
-];
-
-$data_error = false;
-
-foreach ($query_results as $obj) {
-    if ($obj->exisit == null || $obj->forTesting == 0) {
-        $data_error = true;
-    }
+if ($query_order_result == null) {
+    array_push($data_error, '訂單不存在');
+} else if ($query_order_result['ORDER_FOR_TESTING'] == 0 && $admin_level > 2) {
+    array_push($data_error, '無權歸屬測試單');
 }
 
-if (!$data_error) {
+// 判斷：是否有錯誤回饋，「有」則回傳前端、「無」則根據輸入資料新增細項
+if (count($data_error) > 0) {
+    $error_feedback = '<p>輸入資料有誤，回饋清單如下：</p><ul>';
+
+    foreach ($data_error as $error) {
+        switch ($error) {
+            case '方案不存在':
+                $error_feedback = $error_feedback . '<li>方案【 ' . $project_id . ' 】並不存在。</li>';
+                break;
+            case '訂單不存在':
+                $error_feedback = $error_feedback . '<li>訂單【 ' . $order_id . ' 】並不存在。</li>';
+                break;
+            case '無權歸屬測試單':
+                $error_feedback = $error_feedback . '<li>您的權限不足以將測試細項歸屬在非測試訂單上。</li>';
+                break;
+        }
+    }
+
+    $error_feedback = $error_feedback . '</ul><p>請再檢查一次，謝謝。</p>';
+
+    echo $error_feedback;
+} else {
 
     // 執行：選出訂單細項所用的密鑰，以利後續產生購買憑證
     $para = 'order_details';
@@ -154,13 +164,4 @@ if (!$data_error) {
     $statement_update_order_amount->execute();
 
     echo $order_detail_id . ' 細項新增完成了！';
-} else {
-
-    foreach ($query_results as $obj) {
-        if ($obj->exisit == null) {
-            echo $obj->ID . ' ' . $obj->unit . '並不存在。請再檢查一次。<br>';
-        } else if ($obj->forTesting == 0) {
-            echo '您的權限不足以將細項歸屬在非測試訂單上。請再檢查一次。';
-        }
-    }
 }
