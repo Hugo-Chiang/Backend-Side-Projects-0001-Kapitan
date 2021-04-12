@@ -25,19 +25,20 @@ $query_result = $statement_query_session->fetch(PDO::FETCH_ASSOC);
 
 if ($session == $query_result['MEMBER_SESSION']) {
 
-    $sql_update_member_info = "UPDATE members SET 
+    $sql_update_member_info = "UPDATE members SET MEMBER_NICKNAME = ?, 
     MEMBER_NAME = ?, MEMBER_PHONE = ?, MEMBER_AVATAR_URL = ?, MEMBER_NICKNAME = ?, 
     MEMBER_EC_NAME = ?, MEMBER_EC_PHONE = ?, MEMBER_EC_EMAIL = ? 
     WHERE MEMBER_ID = ? && MEMBER_VISIBLE_ON_WEB != 0";
     $statement_update_member_info = $pdo->prepare($sql_update_member_info);
-    $statement_update_member_info->bindParam(1, $edited_details->MCname);
-    $statement_update_member_info->bindParam(2, $edited_details->MCphone);
-    $statement_update_member_info->bindParam(3, $edited_details->memberAvatarURL);
-    $statement_update_member_info->bindParam(4, $edited_details->nickName);
-    $statement_update_member_info->bindParam(5, $edited_details->ECname);
-    $statement_update_member_info->bindParam(6, $edited_details->ECphone);
-    $statement_update_member_info->bindParam(7, $edited_details->ECemail);
-    $statement_update_member_info->bindParam(8, $member_id);
+    $statement_update_member_info->bindParam(1, $edited_details->nickName);
+    $statement_update_member_info->bindParam(2, $edited_details->MCname);
+    $statement_update_member_info->bindParam(3, $edited_details->MCphone);
+    $statement_update_member_info->bindParam(4, $edited_details->memberAvatarURL);
+    $statement_update_member_info->bindParam(5, $edited_details->nickName);
+    $statement_update_member_info->bindParam(6, $edited_details->ECname);
+    $statement_update_member_info->bindParam(7, $edited_details->ECphone);
+    $statement_update_member_info->bindParam(8, $edited_details->ECemail);
+    $statement_update_member_info->bindParam(9, $member_id);
     $statement_update_member_info->execute();
 
     echo '您的個資修改完成了！';

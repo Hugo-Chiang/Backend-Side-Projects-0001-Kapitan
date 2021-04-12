@@ -179,10 +179,9 @@ if (count($alerady_booking_arr) > 0) {
     // 向前端回報結果：成功訂購
     $return_obj = (object)[
         'status' => '訂購成功',
-        'message' => '會員【' . $member_id . '】的訂單完成了！編號是：【' . $insert_order_id . '】。',
+        'message' => '您的訂單完成了！編號是：【' . $insert_order_id . '】。<p>現將引導您回到首頁...</p>',
         'orderID' => $insert_order_id,
-        'noticeEmails' => 'statesman1991@gmail.com, majorrabbit2021@gmail.com',
-        // 'noticeEmails' => $member_account . ', ' . $orderer_email,
+        'noticeEmails' => $member_account . ', ' . $orderer_email,
         'certificateArr' => $order_detail_certificate_arr
     ];
 

@@ -17,6 +17,7 @@ $member_account = $json_data->account;
 $member_password = hash('sha256', $json_data->password);
 $status = 1;
 $visible = 1;
+$testing = 0;
 $sigin_auth = 1;
 
 // 執行：二次把關會員帳號（電郵）是否有重複註冊
@@ -55,8 +56,9 @@ if ($query_result != null && $query_result['MEMBER_ACCOUNT'] == $member_account)
 
     $sql_insert_member_info = "INSERT INTO members 
     (MEMBER_ID, MEMBER_REGISTERED_DATE, MEMBER_STATUS, MEMBER_ACCOUNT, MEMBER_PASSWORD, 
-    MEMBER_SESSION, MEMBER_SIGNIN_TIMEOUT, MEMBER_SIGNIN_AUTHENTICATION, MEMBER_VISIBLE_ON_WEB) 
-    VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?)";
+    MEMBER_SESSION, MEMBER_SIGNIN_TIMEOUT, MEMBER_SIGNIN_AUTHENTICATION, 
+    MEMBER_VISIBLE_ON_WEB, MEMBER_FOR_TESTING) 
+    VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?)";
     $statement_insert_member_info = $pdo->prepare($sql_insert_member_info);
     $statement_insert_member_info->bindParam(1, $member_id);
     $statement_insert_member_info->bindParam(2, $status);
@@ -66,6 +68,7 @@ if ($query_result != null && $query_result['MEMBER_ACCOUNT'] == $member_account)
     $statement_insert_member_info->bindParam(6, $exp_time);
     $statement_insert_member_info->bindParam(7, $sigin_auth);
     $statement_insert_member_info->bindParam(8, $visible);
+    $statement_insert_member_info->bindParam(9, $testing);
     $statement_insert_member_info->execute();
 
     // 執行：將 session 與到期日回傳予前端，以利進行登入驗證
@@ -80,7 +83,7 @@ if ($query_result != null && $query_result['MEMBER_ACCOUNT'] == $member_account)
         'singInStatus' => true,
         'session' => $query_result['MEMBER_SESSION'],
         'expDate' => $query_result['MEMBER_SIGNIN_TIMEOUT'],
-        'message' => '太好了！您已成為甲必丹的會員了。<p>現將引導您回到首頁...</p>'
+        'message' => '太好了！您已成為甲必丹的會員。<p>現將引導您回到首頁...</p>'
     ];
 
     print json_encode($return_obj);
