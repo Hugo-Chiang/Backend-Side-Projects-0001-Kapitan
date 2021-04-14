@@ -52,14 +52,14 @@ $statement_query_secret_key->execute();
 $member_secret_key_row = $statement_query_secret_key->fetch(PDO::FETCH_ASSOC);
 
 // 加密產生 session
-$session = hash('sha256', $member_id . $member_secret_key_row['SECRET_KEY_VALUE']);
+$session = hash('sha256', $member_id . $member_secret_key_row['SECRET_KEY_VALUE'] . date("Y-m-d") . date("h:i:sa"));
 
 // 執行：將新 session 寫入資料庫，並連帶產生到期日
 $time_now = time();
 $exp_time = $time_now + (60 * 60 * 24 * 3);
 $exp_time = date("Y-m-d H:i:s", $exp_time);
 
-$sql_update_new_session = 'UPDATE members SET MEMBER_SESSION = ?, MEMBER_SIGNIN_TIMEOUT = ? WHERE MEMBER_ID = ?';
+$sql_update_new_session = 'UPDATE members SET MEMBER_SESSION = ?, MEMBER_SIGNIN_TIME = NOW(), MEMBER_SIGNIN_TIMEOUT = ? WHERE MEMBER_ID = ?';
 $statement_update_new_session = $pdo->prepare($sql_update_new_session);
 $statement_update_new_session->bindParam(1, $session);
 $statement_update_new_session->bindParam(2, $exp_time);
@@ -76,6 +76,7 @@ $query_result = $statement_query_member_signedin_data->fetch(PDO::FETCH_ASSOC);
 
 $return_obj = (object)[
     'singInStatus' => true,
+    'memberID' => $member_id,
     'session' => $query_result['MEMBER_SESSION'],
     'expDate' => $query_result['MEMBER_SIGNIN_TIMEOUT']
 ];
