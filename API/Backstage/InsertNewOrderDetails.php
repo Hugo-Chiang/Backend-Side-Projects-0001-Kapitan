@@ -30,8 +30,10 @@ if ($admin_level > 2) {
 }
 
 $data_error = [];
+$min_num_people = 0;
+$max_num_people = 0;
 
-// 執行：查詢方案是否存在
+// 執行：查詢方案是否存在或是否人數不符限制
 $project_id = $creatingDetails[0]->PROJECT_ID;
 $sql_query_project = "SELECT * FROM projects WHERE PROJECT_ID = ? && PROJECT_VISIBLE_ON_WEB != 0";
 $statement_query_project = $pdo->prepare($sql_query_project);
@@ -42,6 +44,35 @@ $query_project_result = $statement_query_project->fetch(PDO::FETCH_ASSOC);
 
 if ($query_project_result == null) {
     array_push($data_error, '方案不存在');
+} else {
+    $booking_num_people = $edited_details->bookingNumOfPeople;
+
+    $min_num_people = $query_project_result['PROJECT_MIN_NUM_OF_PEOPLE'];
+    $max_num_people = $query_project_result['PROJECT_MAX_NUM_OF_PEOPLE'];
+
+    if ($booking_num_people < $min_num_people || $booking_num_people > $max_num_people) {
+        array_push($data_error, '預約人數不符限制');
+    }
+}
+
+// 執行：查詢方案是否已被預訂
+$booking_date = $creatingDetails[0]->BOOKING_DATE;
+$booked_order_id = '';
+$booked_order_detail_id = '';
+$sql_query_booking = "SELECT * FROM booking as bk 
+JOIN order_details as odd ON bk.FK_ORDER_DETAIL_ID_for_BK = odd.ORDER_DETAIL_ID 
+WHERE BOOKING_DATE = ? && FK_PROJECT_ID_for_BK = ? && ORDER_DETAIL_STATUS != -1;";
+$statement_query_booking = $pdo->prepare($sql_query_booking);
+$statement_query_booking->bindParam(1,  $booking_date);
+$statement_query_booking->bindParam(2,  $project_id);
+$statement_query_booking->execute();
+
+$query_booking_result = $statement_query_booking->fetch(PDO::FETCH_ASSOC);
+
+if ($query_project_result != null) {
+    $booked_order_id = $query_booking_result['FK_ORDER_ID_for_ODD'];
+    $booked_order_detail_id = $query_booking_result['FK_ORDER_DETAIL_ID_for_BK'];
+    array_push($data_error, '方案已預訂');
 }
 
 // 執行：查詢訂單是否存在或其是否為測試單
@@ -72,6 +103,12 @@ if (count($data_error) > 0) {
         switch ($error) {
             case '方案不存在':
                 $error_feedback = $error_feedback . '<li>方案【 ' . $project_id . ' 】並不存在。</li>';
+                break;
+            case '方案已預訂':
+                $error_feedback = $error_feedback . '<li>日期【 ' . $booking_date . ' 】已有非測試單預訂，係訂單【 ' . $booked_order_id . ' 】下的【 ' . $booked_order_detail_id . ' 】細項。</li>';
+                break;
+            case '預約人數不符限制':
+                $error_feedback = $error_feedback . '<li>方案【 ' . $project_id . ' 】預約人數應介於 ' . $min_num_people . ' - ' . $max_num_people . ' 之間。</li>';
                 break;
             case '訂單不存在':
                 $error_feedback = $error_feedback . '<li>訂單【 ' . $order_id . ' 】並不存在。</li>';
@@ -135,7 +172,7 @@ if (count($data_error) > 0) {
 
     $statement_insert_order_details = $pdo->prepare($sql_insert_order_details);
     $statement_insert_order_details->bindParam(1, $booking_id);
-    $statement_insert_order_details->bindParam(2, $creatingDetails[0]->BOOKING_DATE);
+    $statement_insert_order_details->bindParam(2, $booking_date);
     $statement_insert_order_details->bindParam(3, $creatingDetails[0]->BOOKING_NUM_OF_PEOPLE);
     $statement_insert_order_details->bindParam(4, $visible);
     $statement_insert_order_details->bindParam(5, $creatingDetails[0]->PROJECT_ID);

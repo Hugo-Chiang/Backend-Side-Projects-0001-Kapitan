@@ -68,27 +68,28 @@ if ($admin_level > 2) {
 // 執行：根據輸入資料建立新會員
 $sql_insert_member_info = "INSERT INTO members 
 (MEMBER_ID, MEMBER_REGISTERED_DATE, MEMBER_STATUS, MEMBER_ACCOUNT, MEMBER_PASSWORD, 
-MEMBER_NAME, MEMBER_PHONE, MEMBER_AVATAR_URL, 
+MEMBER_NICKNAME, MEMBER_NAME, MEMBER_PHONE, MEMBER_AVATAR_URL, 
 MEMBER_EC_NAME, MEMBER_EC_PHONE, MEMBER_EC_EMAIL, 
 MEMBER_SESSION, MEMBER_SIGNIN_TIMEOUT, MEMBER_SIGNIN_AUTHENTICATION, 
 MEMBER_VISIBLE_ON_WEB, MEMBER_FOR_TESTING) 
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?)";
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?)";
 $statement_insert_member_info = $pdo->prepare($sql_insert_member_info);
 $statement_insert_member_info->bindParam(1, $member_id);
 $statement_insert_member_info->bindParam(2, $edited_details->memberRegDate);
 $statement_insert_member_info->bindParam(3, $member_status);
 $statement_insert_member_info->bindParam(4, $member_account);
 $statement_insert_member_info->bindParam(5, $member_password);
-$statement_insert_member_info->bindParam(6, $MCname);
-$statement_insert_member_info->bindParam(7, $edited_details->MCphone);
-$statement_insert_member_info->bindParam(8, $edited_details->memberAvatarURL);
-$statement_insert_member_info->bindParam(9, $edited_details->ECname);
-$statement_insert_member_info->bindParam(10, $edited_details->ECphone);
-$statement_insert_member_info->bindParam(11, $edited_details->ECemail);
-$statement_insert_member_info->bindParam(12, $fake_session);
-$statement_insert_member_info->bindParam(13, $signin_authentication);
-$statement_insert_member_info->bindParam(14, $visible);
-$statement_insert_member_info->bindParam(15, $testing);
+$statement_insert_member_info->bindParam(6, $edited_details->nickname);
+$statement_insert_member_info->bindParam(7, $MCname);
+$statement_insert_member_info->bindParam(8, $edited_details->MCphone);
+$statement_insert_member_info->bindParam(9, $edited_details->memberAvatarURL);
+$statement_insert_member_info->bindParam(10, $edited_details->ECname);
+$statement_insert_member_info->bindParam(11, $edited_details->ECphone);
+$statement_insert_member_info->bindParam(12, $edited_details->ECemail);
+$statement_insert_member_info->bindParam(13, $fake_session);
+$statement_insert_member_info->bindParam(14, $signin_authentication);
+$statement_insert_member_info->bindParam(15, $visible);
+$statement_insert_member_info->bindParam(16, $testing);
 $statement_insert_member_info->execute();
 
 echo '會員 ' . $member_id . ' 新增完成了！';
