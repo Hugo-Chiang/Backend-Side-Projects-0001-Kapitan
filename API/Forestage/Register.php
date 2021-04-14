@@ -56,9 +56,9 @@ if ($query_result != null && $query_result['MEMBER_ACCOUNT'] == $member_account)
 
     $sql_insert_member_info = "INSERT INTO members 
     (MEMBER_ID, MEMBER_REGISTERED_DATE, MEMBER_STATUS, MEMBER_ACCOUNT, MEMBER_PASSWORD, 
-    MEMBER_SESSION, MEMBER_SIGNIN_TIMEOUT, MEMBER_SIGNIN_AUTHENTICATION, 
+    MEMBER_SESSION, MEMBER_SIGNIN_TIMEOUT, MEMBER_SIGNIN_TIME, 
     MEMBER_VISIBLE_ON_WEB, MEMBER_FOR_TESTING) 
-    VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?)";
+    VALUES (?, NOW(), ?, ?, ?, ?, ?, NOW(), ?, ?)";
     $statement_insert_member_info = $pdo->prepare($sql_insert_member_info);
     $statement_insert_member_info->bindParam(1, $member_id);
     $statement_insert_member_info->bindParam(2, $status);
@@ -66,9 +66,8 @@ if ($query_result != null && $query_result['MEMBER_ACCOUNT'] == $member_account)
     $statement_insert_member_info->bindParam(4, $member_password);
     $statement_insert_member_info->bindParam(5, $session);
     $statement_insert_member_info->bindParam(6, $exp_time);
-    $statement_insert_member_info->bindParam(7, $sigin_auth);
-    $statement_insert_member_info->bindParam(8, $visible);
-    $statement_insert_member_info->bindParam(9, $testing);
+    $statement_insert_member_info->bindParam(7, $visible);
+    $statement_insert_member_info->bindParam(8, $testing);
     $statement_insert_member_info->execute();
 
     // 執行：將 session 與到期日回傳予前端，以利進行登入驗證

@@ -51,14 +51,14 @@ $statement_query_secret_key->execute();
 $admin_secret_key_row = $statement_query_secret_key->fetch(PDO::FETCH_ASSOC);
 
 // 加密產生 session
-$session = hash('sha256', $admin_id . $admin_identifier_row['ADMIN_IDENTIFIER'] . $admin_secret_key_row['SECRET_KEY_VALUE']);
+$session = hash('sha256', $admin_id . $admin_identifier_row['ADMIN_IDENTIFIER'] . $admin_secret_key_row['SECRET_KEY_VALUE'] . date("Y-m-d") . date("h:i:sa"));
 
 // 執行：將新 session 寫入資料庫，並連帶產生到期日
 $time_now = time();
 $exp_time = $time_now + (60 * 60 * 24 * 3);
 $exp_time = date("Y-m-d H:i:s", $exp_time);
 
-$sql_update_new_session = 'UPDATE admin SET ADMIN_SESSION = ?, ADMIN_SIGNIN_TIMEOUT= ? WHERE ADMIN_ID = ?';
+$sql_update_new_session = 'UPDATE admin SET ADMIN_SESSION = ?, ADMIN_SIGNIN_TIME = NOW(), ADMIN_SIGNIN_TIMEOUT= ? WHERE ADMIN_ID = ?';
 $statement_update_new_session = $pdo->prepare($sql_update_new_session);
 $statement_update_new_session->bindParam(1, $session);
 $statement_update_new_session->bindParam(2, $exp_time);

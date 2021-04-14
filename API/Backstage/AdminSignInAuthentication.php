@@ -29,14 +29,8 @@ if ($query_result == null) {
     exit;
 }
 
-// 執行：將登入驗證狀態（true，1）寫入資料庫
-$sql_update_signin_auth = 'UPDATE admin SET ADMIN_SIGNIN_AUTHENTICATION = "1" WHERE ADMIN_ID = ?';
-$statement_update_signin_authn = $pdo->prepare($sql_update_signin_auth);
-$statement_update_signin_authn->bindParam(1, $query_result['ADMIN_ID']);
-$statement_update_signin_authn->execute();
-
 // 執行：將 session 檢查成功的訊息回傳前端（准許前進），並親切地打聲招呼
-$sql_query_admin_signedin_data = "SELECT ADMIN_NAME, ADMIN_LEVEL  FROM admin WHERE ADMIN_SESSION = ?";
+$sql_query_admin_signedin_data = "SELECT ADMIN_NAME, ADMIN_LEVEL FROM admin WHERE ADMIN_SESSION = ?";
 $statement_query_admin_signedin_data = $pdo->prepare($sql_query_admin_signedin_data);
 $statement_query_admin_signedin_data->bindParam(1, $session_string);
 $statement_query_admin_signedin_data->execute();
