@@ -46,8 +46,10 @@ if ($admin_level > 2) {
 }
 
 $data_error = [];
+$min_num_people = 0;
+$max_num_people = 0;
 
-// 執行：查詢方案是否存在
+// 執行：查詢方案是否存在或是否人數不符限制
 $project_id = $edited_details->projectID;
 $sql_query_project = "SELECT * FROM projects WHERE PROJECT_ID = ? && PROJECT_VISIBLE_ON_WEB != 0";
 $statement_query_project = $pdo->prepare($sql_query_project);
@@ -58,6 +60,15 @@ $query_project_result = $statement_query_project->fetch(PDO::FETCH_ASSOC);
 
 if ($query_project_result == null) {
     array_push($data_error, '方案不存在');
+} else {
+    $booking_num_people = $edited_details->bookingNumOfPeople;
+
+    $min_num_people = $query_project_result['PROJECT_MIN_NUM_OF_PEOPLE'];
+    $max_num_people = $query_project_result['PROJECT_MAX_NUM_OF_PEOPLE'];
+
+    if ($booking_num_people < $min_num_people || $booking_num_people > $max_num_people) {
+        array_push($data_error, '預約人數不符限制');
+    }
 }
 
 // 執行：查詢訂單是否存在或其是否為測試單
@@ -86,6 +97,9 @@ if (count($data_error) > 0) {
                 break;
             case '訂單不存在':
                 $error_feedback = $error_feedback . '<li>訂單【 ' . $order_id . ' 】並不存在。</li>';
+                break;
+            case '預約人數不符限制':
+                $error_feedback = $error_feedback . '<li>方案【 ' . $project_id . ' 】預約人數應介於 ' . $min_num_people . ' - ' . $max_num_people . ' 之間。</li>';
                 break;
             case '無權歸屬測試單':
                 $error_feedback = $error_feedback . '<li>您的權限不足以將測試細項歸屬在非測試訂單上。</li>';
