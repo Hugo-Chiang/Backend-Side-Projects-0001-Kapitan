@@ -13,7 +13,7 @@ $json_data = json_decode($json_string);
 
 // 執行：根據輸入帳密找出特定登入者
 $member_password = hash('sha256', $json_data->password);
-$sql_query_member_account = 'SELECT MEMBER_ID FROM members WHERE MEMBER_ACCOUNT = ? && MEMBER_PASSWORD = ?';
+$sql_query_member_account = 'SELECT MEMBER_ID, MEMBER_STATUS FROM members WHERE MEMBER_ACCOUNT = ? && MEMBER_PASSWORD = ?';
 $statement_query_member_account = $pdo->prepare($sql_query_member_account);
 $statement_query_member_account->bindParam(1, $json_data->account);
 $statement_query_member_account->bindParam(2, $member_password);
@@ -26,6 +26,14 @@ if ($query_result == null) {
     $return_obj = (object)[
         'singInStatus' => false,
         'message' => '帳號或密碼錯誤'
+    ];
+
+    print json_encode($return_obj);
+    exit;
+} else if ($query_result['MEMBER_STATUS'] == 0) {
+    $return_obj = (object)[
+        'singInStatus' => false,
+        'message' => '帳號已被停權，請聯繫客服'
     ];
 
     print json_encode($return_obj);
