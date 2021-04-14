@@ -62,7 +62,7 @@ if ($admin_level > 2) {
 // 執行：根據輸入資料更新會員資訊
 $sql_update_member_info = "UPDATE members SET 
 MEMBER_REGISTERED_DATE = ?, MEMBER_STATUS = ?, MEMBER_ACCOUNT = ?, MEMBER_PASSWORD = ?, 
-MEMBER_NAME = ?, MEMBER_PHONE = ?, MEMBER_AVATAR_URL = ?, 
+MEMBER_NICKNAME = ?, MEMBER_NAME = ?, MEMBER_PHONE = ?, MEMBER_AVATAR_URL = ?, 
 MEMBER_EC_NAME = ?, MEMBER_EC_PHONE = ?, MEMBER_EC_EMAIL = ? 
 WHERE MEMBER_ID = ? && MEMBER_VISIBLE_ON_WEB != 0";
 $statement_update_member_info = $pdo->prepare($sql_update_member_info);
@@ -70,13 +70,14 @@ $statement_update_member_info->bindParam(1, $edited_details->memberRegDate);
 $statement_update_member_info->bindParam(2, $member_status);
 $statement_update_member_info->bindParam(3, $edited_details->memberAccount);
 $statement_update_member_info->bindParam(4, $member_password);
-$statement_update_member_info->bindParam(5, $edited_details->MCname);
-$statement_update_member_info->bindParam(6, $edited_details->MCphone);
-$statement_update_member_info->bindParam(7, $edited_details->memberAvatarURL);
-$statement_update_member_info->bindParam(8, $edited_details->ECname);
-$statement_update_member_info->bindParam(9, $edited_details->ECphone);
-$statement_update_member_info->bindParam(10, $edited_details->ECemail);
-$statement_update_member_info->bindParam(11, $member_id);
+$statement_update_member_info->bindParam(5, $edited_details->nickname);
+$statement_update_member_info->bindParam(6, $edited_details->MCname);
+$statement_update_member_info->bindParam(7, $edited_details->MCphone);
+$statement_update_member_info->bindParam(8, $edited_details->memberAvatarURL);
+$statement_update_member_info->bindParam(9, $edited_details->ECname);
+$statement_update_member_info->bindParam(10, $edited_details->ECphone);
+$statement_update_member_info->bindParam(11, $edited_details->ECemail);
+$statement_update_member_info->bindParam(12, $member_id);
 $statement_update_member_info->execute();
 
 echo '會員 ' . $member_id . ' 的資料修改完成了！';
