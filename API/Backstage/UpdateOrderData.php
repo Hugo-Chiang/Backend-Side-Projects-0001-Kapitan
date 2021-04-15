@@ -63,4 +63,26 @@ $statement_update_order_data->bindParam(11, $edited_details->memberID);
 $statement_update_order_data->bindParam(12, $order_id);
 $statement_update_order_data->execute();
 
+
+// 執行：根據輸入資料更新訂單細項內容
+$sql_query_update_order_details = "SELECT * FROM order_details WHERE FK_ORDER_ID_for_ODD = ? && ORDER_DETAIL_VISIBLE_ON_WEB != 0";
+$statement_query_update_order_details = $pdo->prepare($sql_query_update_order_details);
+$statement_query_update_order_details->bindParam(1, $order_id);
+$statement_query_update_order_details->execute();
+
+$query_query_update_order_details = $statement_query_update_order_details->fetchAll(PDO::FETCH_ASSOC);
+
+if ($query_query_update_order_details != null || false) {
+    for ($i = 0; $i < count($query_query_update_order_details); $i++) {
+        if ($query_query_update_order_details[$i]['ORDER_DETAIL_STATUS'] != 2) {
+            $sql_update_order_details = "UPDATE order_details SET 
+            ORDER_DETAIL_STATUS = ? WHERE ORDER_DETAIL_ID = ? && ORDER_DETAIL_VISIBLE_ON_WEB != 0";
+            $statement_update_order_details = $pdo->prepare($sql_update_order_details);
+            $statement_update_order_details->bindParam(1, $order_status);
+            $statement_update_order_details->bindParam(2, $query_query_update_order_details[$i]['ORDER_DETAIL_ID']);
+            $statement_update_order_details->execute();
+        }
+    }
+}
+
 echo '訂單 ' . $order_id . ' 修改完成了！';

@@ -30,7 +30,9 @@ $statement_query_project_departure_location->execute();
 $query_project_departure_location_result = $statement_query_project_departure_location->fetch(PDO::FETCH_ASSOC);
 
 // 執行：根據方案 ID 回傳該方案的所有預約狀態
-$sql_query_project_booking = "SELECT * FROM booking WHERE FK_PROJECT_ID_for_BK = ?";
+$sql_query_project_booking = "SELECT * FROM booking as bk 
+JOIN order_details as odd ON bk.FK_ORDER_DETAIL_ID_for_BK = odd.ORDER_DETAIL_ID 
+WHERE odd.ORDER_DETAIL_STATUS = 1 && odd.ORDER_DETAIL_VISIBLE_ON_WEB != 0 && bk.FK_PROJECT_ID_for_BK = ?";
 $statement_query_project_booking = $pdo->prepare($sql_query_project_booking);
 $statement_query_project_booking->bindParam(1, $project_id);
 $statement_query_project_booking->execute();
