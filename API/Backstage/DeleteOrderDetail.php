@@ -25,6 +25,7 @@ $statement_query_testing_order_details->execute();
 
 $query_result = $statement_query_testing_order_details->fetch(PDO::FETCH_ASSOC);
 
+$order_id = $query_result['FK_ORDER_ID_for_ODD'];
 $testing = $query_result['ORDER_DETAIL_FOR_TESTING'];
 
 // 透過 session 判斷管理員權限是否足夠進行細項刪除
@@ -40,5 +41,25 @@ $sql_delete_order_detail = "UPDATE order_details SET ORDER_DETAIL_VISIBLE_ON_WEB
 $statement_delete_order_detail = $pdo->prepare($sql_delete_order_detail);
 $statement_delete_order_detail->bindParam(1, $order_detail_id);
 $statement_delete_order_detail->execute();
+
+// 執行：因應細項新增而更新訂單總金額
+$sql_query_order_new_amount = "SELECT sum(ORDER_DETAIL_AMOUNT) FROM
+(SELECT * FROM orders as od JOIN order_details as odd ON 
+odd.FK_ORDER_ID_for_ODD = od.ORDER_ID) as t1 
+WHERE t1.ORDER_ID = ? && t1.ORDER_VISIBLE_ON_WEB != 0 && t1.ORDER_DETAIL_VISIBLE_ON_WEB != 0 
+GROUP BY t1.ORDER_ID";
+$statement_query_order_new_amount = $pdo->prepare($sql_query_order_new_amount);
+$statement_query_order_new_amount->bindParam(1, $order_id);
+$statement_query_order_new_amount->execute();
+
+$query_result = $statement_query_order_new_amount->fetch(PDO::FETCH_ASSOC);
+$order_new_amount = $query_result['sum(ORDER_DETAIL_AMOUNT)'];
+
+$sql_update_order_amount = "UPDATE orders SET ORDER_TOTAL_CONSUMPTION = ? 
+WHERE ORDER_ID = ? && ORDER_VISIBLE_ON_WEB != 0";
+$statement_update_order_amount = $pdo->prepare($sql_update_order_amount);
+$statement_update_order_amount->bindParam(1, $order_new_amount);
+$statement_update_order_amount->bindParam(2, $order_id);
+$statement_update_order_amount->execute();
 
 echo '訂單細項 ' . $order_detail_id . ' 已被刪除了。';
