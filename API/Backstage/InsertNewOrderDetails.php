@@ -45,7 +45,7 @@ $query_project_result = $statement_query_project->fetch(PDO::FETCH_ASSOC);
 if ($query_project_result == null) {
     array_push($data_error, '方案不存在');
 } else {
-    $booking_num_people = $edited_details->bookingNumOfPeople;
+    $booking_num_people = $creatingDetails[0]->BOOKING_NUM_OF_PEOPLE;
 
     $min_num_people = $query_project_result['PROJECT_MIN_NUM_OF_PEOPLE'];
     $max_num_people = $query_project_result['PROJECT_MAX_NUM_OF_PEOPLE'];
@@ -69,7 +69,7 @@ $statement_query_booking->execute();
 
 $query_booking_result = $statement_query_booking->fetch(PDO::FETCH_ASSOC);
 
-if ($query_project_result != null) {
+if ($query_booking_result != null || false) {
     $booked_order_id = $query_booking_result['FK_ORDER_ID_for_ODD'];
     $booked_order_detail_id = $query_booking_result['FK_ORDER_DETAIL_ID_for_BK'];
     array_push($data_error, '方案已預訂');

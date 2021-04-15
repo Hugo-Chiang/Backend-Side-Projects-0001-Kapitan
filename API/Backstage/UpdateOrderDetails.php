@@ -85,10 +85,12 @@ $statement_query_booking->execute();
 
 $query_booking_result = $statement_query_booking->fetch(PDO::FETCH_ASSOC);
 
-if ($query_project_result != null) {
-    $booked_order_id = $query_booking_result['FK_ORDER_ID_for_ODD'];
-    $booked_order_detail_id = $query_booking_result['FK_ORDER_DETAIL_ID_for_BK'];
-    array_push($data_error, '方案已預訂');
+if ($query_project_result != null && false) {
+    if ($query_booking_result['FK_ORDER_DETAIL_ID_for_BK'] != $edited_details->orderDetailID) {
+        $booked_order_id = $query_booking_result['FK_ORDER_ID_for_ODD'];
+        $booked_order_detail_id = $query_booking_result['FK_ORDER_DETAIL_ID_for_BK'];
+        array_push($data_error, '方案已預訂');
+    }
 }
 
 // 執行：查詢訂單是否存在或其是否為測試單
@@ -100,7 +102,7 @@ $statement_query_order->execute();
 
 $query_order_result = $statement_query_order->fetch(PDO::FETCH_ASSOC);
 
-if ($query_order_result == null) {
+if ($query_order_result == null || false) {
     array_push($data_error, '訂單不存在');
 } else if ($query_order_result['ORDER_FOR_TESTING'] == 0 && $admin_level > 2) {
     array_push($data_error, '無權歸屬測試單');

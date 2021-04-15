@@ -26,7 +26,8 @@ $visible = 1;
 $alerady_booking_arr = [];
 
 $sql_query_booking =
-    "SELECT * FROM booking WHERE BOOKING_DATE = ? && FK_PROJECT_ID_for_BK = ? && BOOKING_VISIBLE_ON_WEB != 0";
+    "SELECT * FROM booking as bk JOIN order_details as odd ON bk.FK_ORDER_DETAIL_ID_for_BK = odd.ORDER_DETAIL_ID 
+    WHERE BOOKING_DATE = ? && bk.FK_PROJECT_ID_for_BK = ? && bk.BOOKING_VISIBLE_ON_WEB != 0 && odd.ORDER_DETAIL_STATUS = 1";
 
 for ($i = 0; $i < count($order_details_arr); $i++) {
     $statement_query_booking = $pdo->prepare($sql_query_booking);
@@ -179,7 +180,7 @@ if (count($alerady_booking_arr) > 0) {
     // 向前端回報結果：成功訂購
     $return_obj = (object)[
         'status' => '訂購成功',
-        'message' => '您的訂單完成了！編號是：【' . $insert_order_id . '】。<p>現將引導您回到首頁...</p>',
+        'message' => '您的訂單完成了！編號是：【 ' . $insert_order_id . ' 】。<p>現將引導您回到首頁...</p>',
         'orderID' => $insert_order_id,
         'noticeEmails' => $member_account . ', ' . $orderer_email,
         'certificateArr' => $order_detail_certificate_arr
