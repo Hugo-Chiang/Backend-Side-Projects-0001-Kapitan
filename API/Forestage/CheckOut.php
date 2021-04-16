@@ -47,7 +47,7 @@ if (count($alerady_booking_arr) > 0) {
     // 向前端回傳結果：若干方案已有預約
     $return_obj = (object)[
         'status' => '重複訂購',
-        'message' => '很抱歉，您所挑選的方案中，有【' . count($alerady_booking_arr) . '】筆在剛剛被預約了。系統已為您刪去重複預約的方案，再請確認新的結帳內容。謝謝您！',
+        'message' => '很抱歉，您所挑選的方案中，有【 ' . count($alerady_booking_arr) . ' 】筆在剛剛被預約了。系統已為您刪去重複預約的方案，再請確認新的結帳內容。謝謝您！',
         'invalidProjects' => $alerady_booking_arr,
     ];
 
