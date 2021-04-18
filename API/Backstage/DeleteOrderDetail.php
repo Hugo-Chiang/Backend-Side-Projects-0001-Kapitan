@@ -53,7 +53,12 @@ $statement_query_order_new_amount->bindParam(1, $order_id);
 $statement_query_order_new_amount->execute();
 
 $query_result = $statement_query_order_new_amount->fetch(PDO::FETCH_ASSOC);
-$order_new_amount = $query_result['sum(ORDER_DETAIL_AMOUNT)'];
+
+if ($query_result != false) {
+    $order_new_amount = $query_result['sum(ORDER_DETAIL_AMOUNT)'];
+} else {
+    $order_new_amount = 0;
+}
 
 $sql_update_order_amount = "UPDATE orders SET ORDER_TOTAL_CONSUMPTION = ? 
 WHERE ORDER_ID = ? && ORDER_VISIBLE_ON_WEB != 0";

@@ -29,7 +29,7 @@ JOIN members as mb
 ON t4.FK_MEMBER_ID_for_OD = mb.MEMBER_ID
 WHERE
 MEMBER_ID = ? && ORDER_STATUS LIKE ? 
-&& ORDER_DETAIL_VISIBLE_ON_WEB != 0 && datediff(ORDER_DATE, NOW()) >= -90';
+&& ORDER_VISIBLE_ON_WEB != 0 && datediff(ORDER_DATE, NOW()) >= -90';
 
 $statement_query_order_details = $pdo->prepare($sql_query_order_details);
 $statement_query_order_details->bindParam(1, $json_data->memberID);
