@@ -19,21 +19,12 @@ foreach ($json_data as $properity => $value) {
 
 // 執行：根據關鍵詞查詢相關訂單
 $sql_query_orders = 'SELECT * FROM
-(SELECT * FROM
-(SELECT * FROM
 (SELECT * FROM orders as od
-JOIN order_details as odd
-ON od.ORDER_ID = odd.FK_ORDER_ID_for_ODD) as t1
-JOIN booking as bk
-ON bk.FK_ORDER_DETAIL_ID_for_BK = t1.ORDER_DETAIL_ID) as t2
-JOIN projects as pj
-ON pj.PROJECT_ID = t2.FK_PROJECT_ID_for_BK) as t3
 JOIN members as mb
-ON t3.FK_MEMBER_ID_for_OD = mb.MEMBER_ID
+ON od.FK_MEMBER_ID_for_OD = mb.MEMBER_ID) as t1 
 WHERE
 ORDER_ID like ? && ORDER_DATE like ? && MEMBER_ACCOUNT like ? && 
 ORDER_MC_NAME like ? && ORDER_MC_PHONE like ? && ORDER_STATUS like ? && ORDER_VISIBLE_ON_WEB != 0';
-
 $statement_query_orders = $pdo->prepare($sql_query_orders);
 $statement_query_orders->bindParam(1, $json_data->orderID);
 $statement_query_orders->bindParam(2, $json_data->orderDate);

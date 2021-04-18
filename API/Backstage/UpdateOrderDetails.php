@@ -29,6 +29,7 @@ $statement_query_testing_order_detail->execute();
 $query_testing_order_detail_result = $statement_query_testing_order_detail->fetch(PDO::FETCH_ASSOC);
 
 $testing = $query_testing_order_detail_result['ORDER_DETAIL_FOR_TESTING'];
+$old_order_id =  $query_testing_order_detail_result['FK_ORDER_ID_for_ODD'];
 
 if ($admin_level > 2) {
 
@@ -187,24 +188,33 @@ if (count($data_error) > 0) {
     $statement_update_order_details->execute();
 
     // 執行：因應細項修改而更新訂單總金額
-    $sql_query_order_new_amount = "SELECT sum(ORDER_DETAIL_AMOUNT) FROM
-    (SELECT * FROM orders as od JOIN order_details as odd ON 
-    odd.FK_ORDER_ID_for_ODD = od.ORDER_ID) as t1 
-    WHERE t1.ORDER_ID = ? && t1.ORDER_VISIBLE_ON_WEB != 0 && t1.ORDER_DETAIL_VISIBLE_ON_WEB != 0 
-    GROUP BY t1.ORDER_ID";
-    $statement_query_order_new_amount = $pdo->prepare($sql_query_order_new_amount);
-    $statement_query_order_new_amount->bindParam(1, $edited_details->newOrderID);
-    $statement_query_order_new_amount->execute();
+    $new_order_id = $edited_details->newOrderID;
+    $orders_id_arr = [$new_order_id, $old_order_id];
 
-    $query_result = $statement_query_order_new_amount->fetch(PDO::FETCH_ASSOC);
-    $order_new_amount = $query_result['sum(ORDER_DETAIL_AMOUNT)'];
+    foreach ($orders_id_arr as $index => $id) {
+        $sql_query_order_new_amount = "SELECT sum(ORDER_DETAIL_AMOUNT) FROM
+        (SELECT * FROM orders as od JOIN order_details as odd ON 
+        odd.FK_ORDER_ID_for_ODD = od.ORDER_ID) as t1 
+        WHERE t1.ORDER_ID = ? && t1.ORDER_VISIBLE_ON_WEB != 0 && t1.ORDER_DETAIL_VISIBLE_ON_WEB != 0 
+        GROUP BY t1.ORDER_ID";
+        $statement_query_order_new_amount = $pdo->prepare($sql_query_order_new_amount);
+        $statement_query_order_new_amount->bindParam(1, $id);
+        $statement_query_order_new_amount->execute();
 
-    $sql_update_order_amount = "UPDATE orders SET ORDER_TOTAL_CONSUMPTION = ? 
-    WHERE ORDER_ID = ? && ORDER_VISIBLE_ON_WEB != 0";
-    $statement_update_order_amount = $pdo->prepare($sql_update_order_amount);
-    $statement_update_order_amount->bindParam(1, $order_new_amount);
-    $statement_update_order_amount->bindParam(2, $edited_details->newOrderID);
-    $statement_update_order_amount->execute();
+        $query_result = $statement_query_order_new_amount->fetch(PDO::FETCH_ASSOC);
+        if ($query_result !=  null || false) {
+            $order_new_amount = $query_result['sum(ORDER_DETAIL_AMOUNT)'];
+        } else {
+            $order_new_amount = 0;
+        }
+
+        $sql_update_order_amount = "UPDATE orders SET ORDER_TOTAL_CONSUMPTION = ? 
+        WHERE ORDER_ID = ? && ORDER_VISIBLE_ON_WEB != 0";
+        $statement_update_order_amount = $pdo->prepare($sql_update_order_amount);
+        $statement_update_order_amount->bindParam(1, $order_new_amount);
+        $statement_update_order_amount->bindParam(2, $id);
+        $statement_update_order_amount->execute();
+    }
 
     echo $edited_details->orderDetailID . ' 細項修改完成了！';
 }

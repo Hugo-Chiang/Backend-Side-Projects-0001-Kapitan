@@ -101,3 +101,26 @@ function check_admin_permissions($pdo, $session)
 
     return $query_result['ADMIN_LEVEL'];
 }
+
+//函式：詢問訂單是否無細項，若無則歸零其總額
+function rectify_empty_order($pdo, $order_id)
+{
+    $sql_query_order_details = 'SELECT * FROM order_details
+    WHERE FK_ORDER_ID_for_ODD = ? && ORDER_DETAIL_VISIBLE_ON_WEB != 0';
+
+    $statement_query_order_details = $pdo->prepare($sql_query_order_details);
+    $statement_query_order_details->bindParam(1, $order_id);
+    $statement_query_order_details->execute();
+
+    $query_result = $statement_query_order_details->fetchAll(PDO::FETCH_ASSOC);
+
+    if ($query_result == false || null) {
+        // 執行：根據輸入資料更新訂單資料
+        $amount = 0;
+        $sql_update_order_data = "UPDATE orders SET ORDER_TOTAL_CONSUMPTION = ? WHERE ORDER_ID = ? && ORDER_VISIBLE_ON_WEB != 0";
+        $statement_update_order_data = $pdo->prepare($sql_update_order_data);
+        $statement_update_order_data->bindParam(1, $amount);
+        $statement_update_order_data->bindParam(2, $order_id);
+        $statement_update_order_data->execute();
+    }
+}
